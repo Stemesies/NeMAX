@@ -4,6 +4,8 @@
     
 _Небольшой централизованный мессенджер, написанный на Java_
 
+[![Build](https://github.com/Stemesies/unnamed-messenger/actions/workflows/gradle.yml/badge.svg)](https://github.com/Stemesies/unnamed-messenger/actions/workflows/gradle.yml)
+
 # 
 
 ### Полезные ссылки:
