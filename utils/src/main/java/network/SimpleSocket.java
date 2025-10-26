@@ -1,3 +1,5 @@
+package network;
+
 import java.io.*;
 import java.net.Socket;
 
@@ -11,14 +13,12 @@ import java.net.Socket;
  */
 public class SimpleSocket implements Closeable {
     private Socket socket;
+    private boolean isClosed = false;
 
     private PrintWriter out = null;
     private BufferedReader in = null;
 
     private String peekMessage = null;
-
-    private boolean isClosed = false;
-
 
 
     public SimpleSocket(Socket socket) {
@@ -44,8 +44,14 @@ public class SimpleSocket implements Closeable {
         } catch (IOException e) {
             System.err.println("Error opening socket streams: " + e.getMessage());
             close();
-
         }
+    }
+
+
+
+    private void ensureOpen() throws IllegalStateException {
+        if (isClosed)
+            throw new IllegalStateException("Socket is closed");
     }
 
     public boolean isClosed() {
@@ -58,12 +64,20 @@ public class SimpleSocket implements Closeable {
      * @throws IllegalStateException если сокет закрыт
      */
     public void sendMessage(String message) throws IllegalStateException {
-        if (isClosed)
-            throw new IllegalStateException("Socket is closed");
-
+        ensureOpen();
         out.println(message);
     }
 
+    /**
+     * Проверяет, есть ли новые сообщения от сокета.<br>
+     * Возможно блокирование потока до тех пор, пока не будет получено
+     * новое сообщение, или не будет закрыт сокет. <br>
+     * <br>
+     * При успешном выполнении метода, успешность выполнения
+     * {@link #receiveMessage()} гарантирована и моментальна.
+     * @return true, если сообщение есть<br>
+     *         false, если сокет закрыт, либо произошла ошибка.
+     */
     public boolean hasNewMessage() {
         if(peekMessage != null)
             return true;
@@ -78,9 +92,10 @@ public class SimpleSocket implements Closeable {
     /**
      * Возвращает сообщение от сокета.
      * <p>
-     * Данный метод блокирует дальнейшее выполнение кода,
-     * пока не будет получен ответ или не будет выкинуто исключение.
+     * Возможно блокирование потока до тех пор, пока не будет получено
+     * новое сообщение или не будет закрыт сокет.
      * <p>
+     * Для проверки на новое сообщение можете использовать {@link #hasNewMessage()}
      *
      * @return message, если сообщение успешно получено<br>
      *         null, если клиент был отключен
@@ -92,9 +107,8 @@ public class SimpleSocket implements Closeable {
             peekMessage = null;
             return msg;
         }
-        if (isClosed)
-            throw new IllegalStateException("Socket is closed");
 
+        ensureOpen();
         return rawGetMessage();
     }
 
@@ -107,9 +121,17 @@ public class SimpleSocket implements Closeable {
         }
     }
 
+    /**
+     * Закрывает сокет и все необходимые стримы.<br>
+     * После закрытия, экземпляр класса не может быть использован
+     * и будет выбрасывать {@link IllegalStateException} при попытках использования.<br>
+     * <br>
+     * Данный метод безопасен, и может быть вызван, даже если сокет закрыт.
+     */
     @Override
     public void close() {
         isClosed = true;
+
         if(socket == null)
             return;
 

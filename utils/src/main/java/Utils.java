@@ -1,6 +1,10 @@
 public class Utils {
 
-    public static void helloWorld(String message) {
-        System.out.println("Hello World, " + message);
+    /**
+     * Оборачивает сообщение в формат<br>
+     * {@code [name] message}
+     */
+    public static String createChatMessage(Object name, Object message) {
+        return "[" + name + "] " + message;
     }
 }
