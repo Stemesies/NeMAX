@@ -9,9 +9,18 @@ public abstract class User {
     private String password;
     private int[] friends; // массив id'шников друзей
 
-    public abstract void sendMessage(String text);
-    public abstract ArrayList<Integer> joinGroup(int e); // ? extends Group
-                                            // id группы, в которую вступает пользоватль
-                                            // возвращает переданный на сервер id пользователя?
+    public ArrayList<Integer> request;
+
+    public abstract void sendMessage(String text, int id);
+    public ArrayList<Integer> joinGroup(int e) { // ? extends Group
+                                                 // id группы, в которую вступает пользоватль
+                                                 // возвращает переданный на сервер id пользователя?
+
+        // отправка запроса на сервер на вступление в группу
+        request.add(id);
+        request.add(this.id); // id пользователя
+        return request;
+    }
+
 
 }
