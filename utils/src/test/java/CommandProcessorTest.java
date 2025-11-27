@@ -166,6 +166,16 @@ public class CommandProcessorTest {
     public void invalidSubcommand() {
         var processor = new CommandProcessor();
 
+        Assertions.assertThrowsExactly(IllegalArgumentException.class, () ->
+            processor.register("no_args", (rc) -> rc
+                .subcommand("subcommand", it -> it
+                    .executes(() -> System.out.println("I'm tired"))
+                )
+                .subcommand("subcommand", it -> it
+                    .executes(() -> System.out.println("I'm tired"))
+                )
+            ));
+
         processor.register("no_args", (rc) -> rc
             .subcommand("subcommand", it -> it
                 .executes(() -> System.out.println("I'm tired"))

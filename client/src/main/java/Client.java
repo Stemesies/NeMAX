@@ -1,4 +1,3 @@
-import cli.Command;
 import cli.CommandProcessor;
 import network.SimpleSocket;
 
@@ -100,7 +99,7 @@ public class Client {
             .executes(this::exit)
         );
         commandProcessor.register("retry", (it) -> it
-            .require(this::isDisconnected)
+            .require("Already connected.", this::isDisconnected)
             .executes(this::connect)
         );
 

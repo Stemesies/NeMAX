@@ -1,6 +1,7 @@
 package cli;
 
 import utils.kt.Apply;
+import utils.kt.Check;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,20 +22,20 @@ public class Command {
     private final List<Argument> arguments;
 
     final Apply<Context> action;
-    final Condition condition;
+    final List<Condition> conditions;
 
     private Command(
         String base,
         List<Command> subcommands,
         List<Argument> arguments,
         Apply<Context> action,
-        Condition condition
+        List<Condition> conditions
     ) {
         this.base = base;
         this.subcommands = subcommands;
         this.arguments = arguments;
         this.action = action;
-        this.condition = condition;
+        this.conditions = conditions;
     }
 
     public boolean is(Token token) {
@@ -97,8 +98,10 @@ public class Command {
         if (!token.is(base))
             return new CommandResult(INVALID_TOKEN, context);
 
-        if (condition != null && !condition.check())
-            return new CommandResult(CONDITIONS_NOT_MET, context);
+        for (Condition condition : conditions) {
+            if (!condition.checker.check())
+                return new CommandResult(CONDITIONS_NOT_MET, context, condition.message);
+        }
 
         // Ищем позицию, на которой располагается следующая суб-команда:
         var nextSubcommand = context.position + 1;
@@ -194,9 +197,14 @@ public class Command {
 
     }
 
-    @FunctionalInterface
-    public interface Condition {
-        boolean check();
+    public static class Condition {
+        private final String message;
+        private final Check checker;
+
+        Condition(String message, Check checker) {
+            this.message = message;
+            this.checker = checker;
+        }
     }
 
     public static class Argument {
@@ -216,7 +224,7 @@ public class Command {
         ArrayList<Builder> subcommands = new ArrayList<>();
         ArrayList<Argument> arguments = new ArrayList<>();
         Apply<Context> action = null;
-        Condition condition = null;
+        ArrayList<Condition> conditions = new ArrayList<>();
 
         public Builder(String baseCommand) {
             this.baseCommand = baseCommand;
@@ -226,10 +234,11 @@ public class Command {
          * Устанавливает условие, при котором команда должна
          * запускаться или проходить дальше по иерархии.
          *
+         * @param onFailure сообщение, выводимое при отсутствии необходимых условий.
          * @param condition условие прохода
          */
-        public Builder require(Condition condition) {
-            this.condition = condition;
+        public Builder require(String onFailure, Check condition) {
+            this.conditions.add(new Condition(onFailure, condition));
             return this;
         }
 
@@ -278,7 +287,16 @@ public class Command {
             return this;
         }
 
-        public Builder subcommand(String subcommand, Apply<Builder> subcommandSettings) {
+        public Builder subcommand(String subcommand, Apply<Builder> subcommandSettings)
+            throws IllegalArgumentException {
+
+            for (Command.Builder sb : subcommands) {
+                if (subcommand.equals(sb.baseCommand))
+                    throw new IllegalArgumentException(
+                        "Subcommand '" + subcommand + "' already exists."
+                    );
+            }
+
             var sub = new Builder(subcommand);
             subcommands.add(sub);
             subcommandSettings.run(sub);
@@ -320,7 +338,7 @@ public class Command {
                     .toList(),
                 arguments,
                 action,
-                condition
+                conditions
             );
         }
     }
