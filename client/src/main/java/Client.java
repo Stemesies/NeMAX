@@ -1,17 +1,21 @@
-import java.util.Scanner;
+import cli.CommandProcessor;
 import network.SimpleSocket;
+
+import java.util.Scanner;
 
 public class Client {
 
     private final String host;
     private final int port;
 
+    private final CommandProcessor commandProcessor = new CommandProcessor();
     private SimpleSocket socket = null;
     private final Scanner in = new Scanner(System.in);
 
     public Client(String host, int port) {
         this.host = host;
         this.port = port;
+        registerCommands();
     }
 
     boolean isConnected() {
@@ -62,12 +66,12 @@ public class Client {
             }
             var msg = in.nextLine();
 
-            if (msg.equals("/retry") && isDisconnected()) {
-                connect();
+            if (msg.charAt(0) == '/') {
+                var procError = commandProcessor.execute(msg);
+                if (procError != null)
+                    procError.explain();
+
                 continue;
-            } else if (msg.equals("/exit")) {
-                exit();
-                return;
             }
 
             if (isConnected())
@@ -88,6 +92,17 @@ public class Client {
                 }
             }
         }).start();
+    }
+
+    private void registerCommands() {
+        commandProcessor.register("exit", (it) -> it
+            .executes(this::exit)
+        );
+        commandProcessor.register("retry", (it) -> it
+            .require("Already connected.", this::isDisconnected)
+            .executes(this::connect)
+        );
+
     }
 
     public static void main(String[] args) {
