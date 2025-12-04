@@ -3,7 +3,7 @@ import network.SimpleSocket;
 
 import java.util.Scanner;
 
-public class Client {
+public class ClientMain {
 
     private final String host;
     private final int port;
@@ -12,7 +12,7 @@ public class Client {
     private SimpleSocket socket = null;
     private final Scanner in = new Scanner(System.in);
 
-    public Client(String host, int port) {
+    public ClientMain(String host, int port) {
         this.host = host;
         this.port = port;
         registerCommands();
@@ -106,7 +106,7 @@ public class Client {
     }
 
     public static void main(String[] args) {
-        var client = new Client("127.0.0.1", 8080);
+        var client = new ClientMain("127.0.0.1", 8080);
         client.connect();
         client.processInput();
     }

@@ -1,14 +1,15 @@
+import elements.Client;
+import network.SimpleServerSocket;
+
 import java.util.ArrayList;
 import java.util.Scanner;
-import network.SimpleServerSocket;
-import network.SimpleSocket;
 import utils.Utils;
 
-public class Server {
+public class ServerMain {
     SimpleServerSocket socket = null;
     private final Scanner in = new Scanner(System.in);
 
-    private final ArrayList<SimpleSocket> clients = new ArrayList<>();
+    private final ArrayList<Client> clients = new ArrayList<>();
 
     public void start() {
         socket = new SimpleServerSocket(8080);
@@ -24,9 +25,10 @@ public class Server {
     private void acceptClients() {
         new Thread(() -> {
             while (socket != null) {
-                var client = socket.accept();
-                if (client == null)
+                var clSocket = socket.accept();
+                if (clSocket == null)
                     continue;
+                var client = new Client(clSocket);
                 System.out.println("new client");
                 clients.add(client);
                 processClient(client);
@@ -37,7 +39,7 @@ public class Server {
     public void stop() {
         broadcast("Closing server...");
 
-        new ArrayList<>(clients).forEach(SimpleSocket::close);
+        new ArrayList<>(clients).forEach(Client::close);
         System.out.println("Server closed.");
         socket.close();
         System.exit(0);
@@ -59,9 +61,9 @@ public class Server {
      * @param message сообщение для вещания
      * @param excludedClient клиент, которому не следует присылать сообщение
      */
-    public void broadcast(String message, SimpleSocket excludedClient) {
+    public void broadcast(String message, Client excludedClient) {
         for (var client : clients)
-            if (!client.equals(excludedClient))
+            if (client != excludedClient)
                 client.sendMessage(message);
     }
 
@@ -70,7 +72,7 @@ public class Server {
      * (получение и отправка сообщений).<br>
      * Данный поток живет до тех пор, пока не будет разорвано соединение.
      */
-    public void processClient(SimpleSocket client) {
+    public void processClient(Client client) {
         new Thread(() -> {
             System.out.printf("Client %s connected\n", client);
 
@@ -105,6 +107,6 @@ public class Server {
     }
 
     public static void main(String[] args) {
-        new Server().start();
+        new ServerMain().start();
     }
 }
