@@ -1,8 +1,7 @@
 package managers;
 
-//import elements.Group;
-import elements.GroupClient;
-import elements.UserClient;
+import elements.Group;
+import elements.User;
 import requests.JoinRequest;
 
 public class JoinManager extends JoinRequest implements Manager{
@@ -10,13 +9,13 @@ public class JoinManager extends JoinRequest implements Manager{
      * @param user - пользователь
      * @param group - группа, в которую вступает пользователь
      */
-    private void joinGroup(UserClient user, GroupClient group) {
+    private void joinGroup(User user, Group group) {
         group.includeUser(user.getUserId());
     }
 
     // нужно будет задать значение обоим полям перед вызовом
-    UserClient user;
-    GroupClient group;
+    User user;
+    Group group;
 
     @Override
     public void applyManager() {

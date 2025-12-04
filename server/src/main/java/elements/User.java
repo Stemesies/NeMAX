@@ -6,7 +6,7 @@ import managers.RegisterManager;
 
 import java.util.ArrayList;
 
-public class UserServer extends User{
+public class User extends AbstractUser {
 
     ArrayList<? extends SuperRequest> requests;
 
@@ -20,16 +20,16 @@ public class UserServer extends User{
             SuperRequest r = requests.getFirst();
 //            Manager manager = new Manager();
             switch(r.type) {
-                case register:
+                case Register:
                     RegisterManager manager1 = new RegisterManager();
                     /*что-нибудь про регистрацию*/
                     break;
-                case join:
+                case Join:
                     JoinManager manager2 = new JoinManager();
                     // достаём пользователя и группу из базы данных по id, инициилизируем поля класса
                     manager2.applyManager();
                     break;
-                case friend:
+                case Friend:
                     FriendManager manager3 = new FriendManager();
                     // достаём пользователей из базы данных по id, инициилизируем поля класса
                     // response = true, пока мы не продумали ответ второго пользователя

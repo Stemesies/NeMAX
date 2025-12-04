@@ -2,7 +2,7 @@ package elements;
 
 import java.util.ArrayList;
 
-public abstract class Group {
+public abstract class AbstractGroup {
     private int id;
     private String groupName;
     private String name;

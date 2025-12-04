@@ -2,7 +2,7 @@ package elements;
 
 //import java.util.ArrayList;
 
-public class UserClient extends User{
+public class User extends AbstractUser {
 
     @Override
     public void sendMessage(String text, int id) {

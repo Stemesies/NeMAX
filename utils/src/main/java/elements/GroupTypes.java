@@ -1,7 +1,7 @@
 package elements;
 
 public enum GroupTypes {
-    chat,
-    group,
-    channel;
+    Chat,
+    Group,
+    Channel
 }

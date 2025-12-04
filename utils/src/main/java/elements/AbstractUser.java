@@ -2,7 +2,7 @@ package elements;
 
 import java.util.ArrayList;
 
-public abstract class User {
+public abstract class AbstractUser {
     private int id; // int - ?
     private String userName;
     private String name;

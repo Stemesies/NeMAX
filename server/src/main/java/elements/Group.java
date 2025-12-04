@@ -1,6 +1,6 @@
 package elements;
 
-public class GroupServer extends Group{
+public class Group extends AbstractGroup {
     @Override
     public void includeUser(int id) {
 

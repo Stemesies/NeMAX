@@ -4,6 +4,6 @@ import elements.SuperRequest;
 
 public class RegisterRequest extends SuperRequest {
     String login;
-    String password; // String? Hash?
+    String password;
 
 }
