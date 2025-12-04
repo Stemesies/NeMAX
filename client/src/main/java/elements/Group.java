@@ -1,6 +1,5 @@
 package elements;
 
-
 public class Group extends AbstractGroup {
 
     @Override
@@ -10,9 +9,7 @@ public class Group extends AbstractGroup {
 
     @Override
     public void excludeUser(int id) {
-//        Integer test = 5;
         this.members.remove(members.indexOf(id));
     }
-
 
 }

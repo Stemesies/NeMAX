@@ -19,14 +19,15 @@ public class User extends AbstractUser {
         while (!this.requests.isEmpty()) {
             SuperRequest r = requests.getFirst();
 //            Manager manager = new Manager();
-            switch(r.type) {
+            switch (r.type) {
                 case Register:
                     RegisterManager manager1 = new RegisterManager();
                     /*что-нибудь про регистрацию*/
                     break;
                 case Join:
-                    // достаём пользователя и группу из базы данных по id, инициилизируем поля класса
-                    // пока вставим заглушки
+                    // Достаём пользователя и группу из базы данных по id,
+                    // инициализируем поля класса.
+                    // Пока вставим заглушки
                     User user = new User();
                     Group group = new Group();
                     JoinManager manager2 = new JoinManager(user, group);

@@ -28,8 +28,9 @@ public class Client {
         socket.close();
     }
 
-
     /**
+     * Отправляет сообщение клиенту.
+     *
      * @see SimpleSocket#sendMessage(String)
      */
     public void sendMessage(String message) throws IllegalStateException {
@@ -37,6 +38,8 @@ public class Client {
     }
 
     /**
+     * Проверяет, есть ли новые сообщения от клиента.
+     *
      * @see SimpleSocket#hasNewMessage()
      */
     public boolean hasNewMessage() {
@@ -44,6 +47,8 @@ public class Client {
     }
 
     /**
+     * Ждет и возвращает сообщение от клиента.
+     *
      * @see SimpleSocket#receiveMessage()
      */
     public String receiveMessage() throws IllegalStateException {

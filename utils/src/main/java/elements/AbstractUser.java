@@ -12,10 +12,12 @@ public abstract class AbstractUser {
     public ArrayList<Integer> request;
 
     public abstract void sendMessage(String text, int id);
+
     /*Реализация этого запроса будет переписана*/
-    public ArrayList<Integer> joinGroup(int id) { // ? extends Group
-                                                 // id группы, в которую вступает пользоватль
-                                                 // возвращает переданный на сервер id пользователя?
+    public ArrayList<Integer> joinGroup(int id) {
+        // ? Extends Group
+        // id группы, в которую вступает пользователь.
+        // Возвращает переданный на сервер id пользователя?
 
         // отправка запроса на сервер на вступление в группу
         request.add(id);

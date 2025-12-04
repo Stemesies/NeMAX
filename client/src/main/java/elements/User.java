@@ -1,7 +1,5 @@
 package elements;
 
-//import java.util.ArrayList;
-
 public class User extends AbstractUser {
 
     @Override

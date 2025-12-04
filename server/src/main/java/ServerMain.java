@@ -3,8 +3,6 @@ import network.SimpleServerSocket;
 
 import java.util.ArrayList;
 import java.util.Scanner;
-import network.SimpleServerSocket;
-import network.SimpleSocket;
 import utils.Utils;
 
 public class ServerMain {

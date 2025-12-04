@@ -17,6 +17,7 @@ public abstract class AbstractGroup {
     }
 
     public abstract void includeUser(int id);
+
     public abstract void excludeUser(int id);
 
 }

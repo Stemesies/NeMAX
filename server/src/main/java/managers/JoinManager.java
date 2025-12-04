@@ -4,8 +4,11 @@ import elements.Group;
 import elements.User;
 import requests.JoinRequest;
 
-public class JoinManager extends JoinRequest implements Manager{
+public class JoinManager extends JoinRequest implements Manager {
+
     /**
+     * TODO написать документацию.
+     *
      * @param user - пользователь
      * @param group - группа, в которую вступает пользователь
      */
@@ -20,6 +23,7 @@ public class JoinManager extends JoinRequest implements Manager{
         this.user = user;
         this.group = group;
     }
+
     @Override
     public void applyManager() {
         this.joinGroup(this.user, this.group);

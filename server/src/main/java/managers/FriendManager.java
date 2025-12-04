@@ -3,10 +3,12 @@ package managers;
 import elements.User;
 import requests.FriendRequest;
 
-public class FriendManager extends FriendRequest implements Manager{
+public class FriendManager extends FriendRequest implements Manager {
     /**
-    * @param user1 - кого принимают в друзья
-    * @param user2 - кто принимает в друзья
+     * TODO написать документацию.
+     *
+     * @param user1 - кого принимают в друзья
+     * @param user2 - кто принимает в друзья
      * @param response - ответ пользователя, которому отправили завявку (принял/отклонил)
      */
     private void addToFriends(User user1, User user2, boolean response) {
