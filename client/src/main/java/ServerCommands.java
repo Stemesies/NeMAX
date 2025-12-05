@@ -13,11 +13,13 @@ public class ServerCommands {
         public Client client;
         public User user;
         public Group group;
+        FriendRequest request;
 
-        public ServerContextData(/*Client client, User user, Group group*/) {
+        public ServerContextData(/*Client client, User user, Group group, FriendRequest request*/) {
 //            this.client = client;
 //            this.user = user;
 //            this.group = group;
+//            this.request = request;
         }
     }
 
@@ -30,8 +32,7 @@ public class ServerCommands {
 
     }
 
-    FriendRequest friendRequestMsg() {
-        var request = new FriendRequest();
+    void friendRequestMsg() {
 
         System.out.printf("You received a friend request from user %s\n! Are you want to approve it?",
                 data.user.getUserName());
@@ -42,18 +43,18 @@ public class ServerCommands {
             resp = responseInput.nextLine();
 
             if (resp.equals("y")) {
-                request.requested = true;
-                request.isResponsed = true;
+                this.data.request.requested = true;
+                this.data.request.isResponsed = true;
             } else if (resp.equals("n")) {
-                request.requested = false;
-                request.isResponsed = true;
+                this.data.request.requested = false;
+                this.data.request.isResponsed = true;
             } else {
-                request.isResponsed = false;
+                this.data.request.isResponsed = false;
             }
         }
 
         responseInput.close();
-        return request;
+//        return request;
     }
 
     void friendAddMsg() {
@@ -73,10 +74,10 @@ public class ServerCommands {
     }
 
     void initFriendResponse() {
-        var req = friendRequestMsg();
-        if (!req.isResponsed)
+        friendRequestMsg();
+        if (!this.data.request.isResponsed)
             throw new Error(); // Ошибка: получена неверная команда.
-        var answer = req.requested ? "y" : "n";
+        var answer = this.data.request.requested ? "y" : "n";
         processor.register("friend", (a) -> a
                 .description("add user to your friends or not?")
                 .requireArgument(answer)
@@ -85,9 +86,11 @@ public class ServerCommands {
                 .subcommand("cancel", (c) -> c
                         .description("cancel friend request"))
                 .executes((success) -> {
-                    if (success.getString(answer).equals("y")) {
-                        success.data.user.addFriend(req.friendId);
-                    }
+                    System.out.printf("You received a friend request from user %s\n! Are you want to approve it?",
+                            data.user.getUserName());
+//                    if (success.getString(answer).equals("y")) {
+//                        success.data.user.addFriend(req.friendId);
+//                    }
                 })
         );
     }
