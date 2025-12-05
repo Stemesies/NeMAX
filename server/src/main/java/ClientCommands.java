@@ -39,7 +39,6 @@ public class ClientCommands {
 
     private static void accountCategoryInit() {
         processor.register("register", (a) -> a
-            .description("Создание нового аккаунта")
             .require("You are already logged in.", (ctx) -> !ctx.data.isAuthenticated())
             .requireArgument("username")
             .requireArgument("password")
@@ -52,7 +51,6 @@ public class ClientCommands {
             )
         );
         processor.register("login", (a) -> a
-            .description("Вход в существующий аккаунт")
             .require("You are already logged in.", (ctx) -> !ctx.data.isAuthenticated())
             .requireArgument("username")
             .requireArgument("password")
@@ -65,7 +63,6 @@ public class ClientCommands {
             )
         );
         processor.register("logout", (a) -> a
-            .description("Выход из учетной записи")
             .require(requireAuth)
             .executes((ctx) -> {
                 ctx.data.user = null;
@@ -73,7 +70,6 @@ public class ClientCommands {
             })
         );
         processor.register("changeName", (a) -> a
-            .description("Устанавливает новый ник")
             .require(requireAuth)
             .requireArgument("nickname")
             .executes((ctx) -> ctx.data.user.changeName(
@@ -82,7 +78,6 @@ public class ClientCommands {
             ))
         );
         processor.register("changePassword", (a) -> a
-            .description("Устанавливает новый пароль")
             .require(requireAuth)
             .requireArgument("oldPassword")
             .requireArgument("password")
@@ -95,10 +90,6 @@ public class ClientCommands {
             ))
         );
         processor.register("profile", (a) -> a
-            .description(
-                "Показывает профиль пользователя @username."
-                    + "Если второй аргумент не задан, показывается свой профиль"
-            )
             .require(requireAuth)
             .findArgument("username")
             .executes((ctx) -> {
@@ -114,10 +105,8 @@ public class ClientCommands {
 
     private static void friendsCategoryInit() {
         processor.register("friends", (a) -> a
-            .description("Управление списком друзей")
             .require(requireAuth)
             .subcommand("list", (b) -> b
-                .description("Выводит список друзей")
                 .executes((ctx) -> {
                     var list = ctx.data.user.getFriends();
                     if (list.isEmpty())
@@ -127,24 +116,17 @@ public class ClientCommands {
                 })
             )
             .subcommand("request", (b) -> b
-                .description("Отправка запроса на дружбу пользователю @username")
                 .requireArgument("username")
                 .executes((ctx) -> ctx.data.user
                     .sendFriendRequest(ctx.getString("username"))
                 )
-            )
-            .subcommand("request", (b) -> b
-                .description("Отзыв отправленного запроса на дружбу пользователю @username")
-                .requireArgument("username")
-                .executes((ctx) -> ctx.data.user
-                    .dismissFriendRequest(ctx.getString("username"))
-                )
+                .subcommand("dismiss", (c -> c
+                    .executes((ctx) -> ctx.data.user
+                        .dismissFriendRequest(ctx.getString("username"))
+                    )
+                ))
             )
             .subcommand("accept", (b) -> b
-                .description(
-                    "Принятие запроса на дружбу от @username, либо,"
-                        + "если аргумент не дан, первого попавшегося"
-                )
                 .findArgument("username")
                 .executes((ctx) ->
                     // TODO: да
@@ -152,10 +134,6 @@ public class ClientCommands {
                 )
             )
             .subcommand("deny", (b) -> b
-                .description(
-                    "Отклонение запроса на дружбу от @username, либо,"
-                        + "если аргумент не дан, первого попавшегося"
-                )
                 .findArgument("username")
                 .executes((ctx) ->
                     // TODO: да
@@ -163,9 +141,6 @@ public class ClientCommands {
                 )
             )
             .subcommand("remove", (b) -> b
-                .description(
-                    "Удаление запроса на дружбу от @username из друзей"
-                )
                 .requireArgument("username")
                 .executes((ctx) ->
                     // TODO: да
@@ -177,7 +152,6 @@ public class ClientCommands {
 
     private static void groupsCategoryInit() {
         processor.register("groups", (a) -> a
-            .description("Управление группами")
             .require(requireAuth)
             .subcommand("create", (b) -> b
                 .description("Создает группу #groupname с названием name.")
@@ -189,14 +163,12 @@ public class ClientCommands {
                 })
             )
             .subcommand("delete", (b) -> b
-                .description("Удаляет группу")
                 .executes((ctx) -> {
                     // TODO: yea....
                     ctx.out.println("Deleted");
                 })
             )
             .subcommand("invite", (b) -> b
-                .description("Приглашает @username в группу.")
                 .requireArgument("username")
                 .executes((ctx) -> {
                     // TODO: ...
@@ -204,10 +176,6 @@ public class ClientCommands {
                 })
             )
             .subcommand("accept", (b) -> b
-                .description(
-                    "Принятие приглашения в группу #groupname, либо,"
-                        + "если аргумент не дан, первого попавшегося"
-                )
                 .findArgument("groupname")
                 .executes((ctx) ->
                     // TODO: .......
@@ -215,10 +183,6 @@ public class ClientCommands {
                 )
             )
             .subcommand("deny", (b) -> b
-                .description(
-                    "Отклонение приглашения в группу #groupname, либо,"
-                        + "если аргумент не дан, первого попавшегося"
-                )
                 .findArgument("groupname")
                 .executes((ctx) ->
                     // TODO: ..... *глубокий затяг*
@@ -226,7 +190,6 @@ public class ClientCommands {
                 )
             )
             .subcommand("kick", (b) -> b
-                .description("Исключает @username из группы.")
                 .requireArgument("username")
                 .executes((ctx) -> {
                     // TODO: ...
@@ -234,7 +197,6 @@ public class ClientCommands {
                 })
             )
             .subcommand("ban", (b) -> b
-                .description("Банит @username из группы.")
                 .requireArgument("username")
                 .executes((ctx) -> {
                     // TODO: ..Окей, это уже неловко
@@ -242,7 +204,6 @@ public class ClientCommands {
                 })
             )
             .subcommand("to", (b) -> b
-                .description("Конвертирует группу")
                 .subcommand("channel", (c) -> c
                     .executes((ctx) -> {
                         // TODO: Не сбавляем темп неловкости
@@ -257,7 +218,6 @@ public class ClientCommands {
                 )
             )
             .subcommand("changeName", (b) -> b
-                .description("Меняет название группы.")
                 .requireArgument("newName")
                 .executes((ctx) -> {
                     // TODO: Хоть все и думали, что он пожилой
@@ -265,7 +225,6 @@ public class ClientCommands {
                 })
             )
             .subcommand("op", (b) -> b
-                .description("Делает @username админом группы.")
                 .requireArgument("username")
                 .executes((ctx) -> {
                     // TODO: Ну а истина в том, что он был молодцом...
@@ -273,7 +232,6 @@ public class ClientCommands {
                 })
             )
             .subcommand("deop", (b) -> b
-                .description("Исключает @username из админов группы.")
                 .requireArgument("username")
                 .executes((ctx) -> {
                     // TODO: ... Просто немного странным.
@@ -281,7 +239,6 @@ public class ClientCommands {
                 })
             )
             .subcommand("chown", (b) -> b
-                .description("Передаёт права на группу @username.")
                 .requireArgument("username")
                 .executes((ctx) -> {
                     // TODO: [[Ссылка удалена]]

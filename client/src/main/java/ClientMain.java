@@ -117,6 +117,7 @@ public class ClientMain {
             .require("Already connected.", this::isDisconnected)
             .executes(this::connect)
         );
+        ServersideCommands.init(commandProcessor);
 
     }
 
