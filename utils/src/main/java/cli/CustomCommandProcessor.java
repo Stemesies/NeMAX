@@ -10,10 +10,42 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static cli.CommandResults.COMMAND_NOT_FOUND;
-import static cli.CommandResults.NOT_A_COMMAND;
+import static cli.CommandErrors.COMMAND_NOT_FOUND;
+import static cli.CommandErrors.NOT_A_COMMAND;
 
-public class CustomCommandProcessor<T/* extends ContextData*/> {
+/**
+ * Данный класс позволяет передавать в рантайм команды определенные данные.
+ * <br> Эти данные можно получать, обращаясь к контексту выполнения команды. ({@link Context#data})
+ * <br> Например:
+ * <pre><code>
+ *     class MyData {
+ *         int myField = 1;
+ *     }
+ *
+ *     var processor = new CommandProcessor<MyData>()
+ *     processor.register("myCommand", (a)->a
+ *         .require("Error: not 1.", (context)-> context.data.myField == 1)
+ *         .executes((context)->
+ *             System.out.println(
+ *                 "MyData.myField == " + context.data.myField
+ *             )
+ *         )
+ *     );
+ *     processor.execute("/myCommand", new MyData());
+ * </code></pre>
+ * <pre><code>
+ *     var myData = new MyData();
+ *     processor.execute("/myCommand", myData);
+ *     > MyData.myField == 1
+ *     myData.myField = 2;
+ *     processor.execute("/myCommand", myData);
+ *     > Error: not 1.
+ *
+ * </code></pre>
+ *
+ * @see CommandProcessor
+ */
+public class CustomCommandProcessor<T> {
 
     private final StringPrintWriter output = new StringPrintWriter();
     private CommandError lastError = null;
@@ -43,11 +75,12 @@ public class CustomCommandProcessor<T/* extends ContextData*/> {
     }
 
     public String getOutput() {
-        return output.isEmpty() ? null : output.toString();
+        return output.toString();
     }
 
     // ---------------------------------
 
+    @Deprecated(forRemoval = true)
     public void register(Command<T> command) {
         registeredCommands.add(command);
     }
@@ -72,7 +105,6 @@ public class CustomCommandProcessor<T/* extends ContextData*/> {
         var result = execute(input, contextData);
 
         if (result != null) {
-            lastError = result;
             result.explain();
             return false;
         }
@@ -89,17 +121,18 @@ public class CustomCommandProcessor<T/* extends ContextData*/> {
      *     <br>false, если возникла ошибка
      */
     public CommandError execute(String input, T contextData) {
+        lastError = internalExecute(input, contextData);
+        return lastError;
+    }
+
+    private CommandError internalExecute(String input, T contextData) {
         output.clear();
 
-        if (input.charAt(0) != '/') {
-            lastError = new CommandError(NOT_A_COMMAND, input, 0, input.length());
-            return lastError;
-        }
+        if (input.charAt(0) != '/')
+            return new CommandError(NOT_A_COMMAND, input, 0, input.length());
 
-        if (input.equals("/")) {
-            lastError = new CommandError(NOT_A_COMMAND, input, 0, input.length());
-            return lastError;
-        }
+        if (input.equals("/"))
+            return new CommandError(NOT_A_COMMAND, input, 0, input.length());
 
         lastError = CommandValidator.validate(input);
         if (lastError != null)
@@ -114,8 +147,8 @@ public class CustomCommandProcessor<T/* extends ContextData*/> {
 
             if (command.isPhantom != null)
                 return command.isPhantom;
-            lastError = command.execute(new Context<>(output, tokens, input, contextData));
-            return lastError;
+
+            return command.execute(new Context<>(output, tokens, input, contextData));
         }
 
         return new CommandError(COMMAND_NOT_FOUND, input, firstToken);

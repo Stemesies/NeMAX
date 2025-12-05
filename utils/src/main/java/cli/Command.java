@@ -10,15 +10,15 @@ import utils.kt.CheckIf;
 import java.util.ArrayList;
 import java.util.List;
 
-import static cli.CommandResults.CUSTOM_ERROR;
-import static cli.CommandResults.FURTHER_SUBCOMMANDS_EXPECTED;
-import static cli.CommandResults.INVALID_SUBCOMMAND;
-import static cli.CommandResults.INVALID_TOKEN;
-import static cli.CommandResults.MISSING_REQUIRED_ARGUMENT;
-import static cli.CommandResults.PHANTOM_COMMAND;
-import static cli.CommandResults.UNKNOWN_SUBCOMMAND;
+import static cli.CommandErrors.CUSTOM_ERROR;
+import static cli.CommandErrors.FURTHER_SUBCOMMANDS_EXPECTED;
+import static cli.CommandErrors.INVALID_SUBCOMMAND;
+import static cli.CommandErrors.INVALID_TOKEN;
+import static cli.CommandErrors.MISSING_REQUIRED_ARGUMENT;
+import static cli.CommandErrors.PHANTOM_COMMAND;
+import static cli.CommandErrors.UNKNOWN_SUBCOMMAND;
 
-public class Command<T /*extends ContextData*/> {
+public class Command<T> {
 
     final String base;
     final String helpDescription;
@@ -52,7 +52,7 @@ public class Command<T /*extends ContextData*/> {
         return base.equals(token.content());
     }
 
-    public static <T /*extends ContextData*/> Builder<T> create(String baseCommand) {
+    public static <T> Builder<T> create(String baseCommand) {
         return new Builder<>(baseCommand);
     }
 
@@ -159,7 +159,7 @@ public class Command<T /*extends ContextData*/> {
 
     // -------
 
-    public static class Builder<T /*extends ContextData*/> {
+    public static class Builder<T> {
 
         String baseCommand;
         String helpDescription = null;
@@ -177,7 +177,7 @@ public class Command<T /*extends ContextData*/> {
         /**
          * Позволяет заявить команде /help, что данная команда существует.
          * При этом ее нельзя будет вызвать:
-         * процессор будет выдавать ошибку {@link CommandResults#COMMAND_NOT_FOUND}.
+         * процессор будет выдавать ошибку {@link CommandErrors#COMMAND_NOT_FOUND}.
          * <br>
          * <br> !! Данный метод не должен применяться к суб-командам !!
          *
@@ -195,7 +195,7 @@ public class Command<T /*extends ContextData*/> {
         /**
          * Позволяет заявить команде /help, что данная команда существует.
          * При этом ее нельзя будет вызвать:
-         * процессор будет выдавать ошибку {@link CommandResults#PHANTOM_COMMAND}.
+         * процессор будет выдавать ошибку {@link CommandErrors#PHANTOM_COMMAND}.
          * <br>
          * <br> !! Данный метод не должен применяться к суб-командам !!
          *

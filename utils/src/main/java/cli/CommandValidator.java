@@ -1,10 +1,10 @@
 package cli;
 
-import static cli.CommandResults.EMPTY_COMMAND;
-import static cli.CommandResults.INVALID_SEPARATOR;
-import static cli.CommandResults.NO_SEPARATION;
-import static cli.CommandResults.UNCLOSED_QUOTE;
-import static cli.CommandResults.UNEXPECTED_SYMBOL;
+import static cli.CommandErrors.EMPTY_COMMAND;
+import static cli.CommandErrors.INVALID_SEPARATOR;
+import static cli.CommandErrors.NO_SEPARATION;
+import static cli.CommandErrors.UNCLOSED_QUOTE;
+import static cli.CommandErrors.UNEXPECTED_SYMBOL;
 
 public class CommandValidator {
 

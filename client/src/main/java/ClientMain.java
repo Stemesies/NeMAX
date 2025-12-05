@@ -1,15 +1,16 @@
 import cli.CommandProcessor;
-import cli.CommandResults;
 import network.SimpleSocket;
 
 import java.util.Scanner;
 
-import static cli.CommandResults.PHANTOM_COMMAND;
+import static cli.CommandErrors.PHANTOM_COMMAND;
 
 public class ClientMain {
 
     private final String host;
     private final int port;
+
+    private int currentChat = -1;
 
     private final CommandProcessor commandProcessor = new CommandProcessor();
     private SimpleSocket socket = null;
@@ -19,6 +20,7 @@ public class ClientMain {
         this.host = host;
         this.port = port;
         registerClientsideCommands();
+        ServersideCommands.init(commandProcessor);
     }
 
     boolean isConnected() {
@@ -70,7 +72,7 @@ public class ClientMain {
             var msg = in.nextLine();
 
             if (msg.charAt(0) == '/') {
-                commandProcessor.execute(msg, null);
+                commandProcessor.execute(msg);
                 var procError = commandProcessor.getLastError();
                 var procOutput = commandProcessor.getOutput();
                 if (procError != null) {
@@ -92,7 +94,7 @@ public class ClientMain {
         if (isConnected())
             socket.sendMessage(msg);
         else
-            System.err.println("Not connected to server.");
+            System.err.println("Not connected to the server.");
     }
 
     private void processConnection() {
@@ -117,7 +119,6 @@ public class ClientMain {
             .require("Already connected.", this::isDisconnected)
             .executes(this::connect)
         );
-        ServersideCommands.init(commandProcessor);
 
     }
 

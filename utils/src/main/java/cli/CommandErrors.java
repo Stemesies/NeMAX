@@ -2,7 +2,7 @@ package cli;
 
 import cli.utils.Token;
 
-public enum CommandResults {
+public enum CommandErrors {
 
     // Validator
     EMPTY_COMMAND("Command is empty."),
@@ -26,7 +26,7 @@ public enum CommandResults {
 
     private final String message;
 
-    CommandResults(String message) {
+    CommandErrors(String message) {
         this.message = message;
     }
 
@@ -42,7 +42,7 @@ public enum CommandResults {
         return new CommandError(this, command, token.start(), token.end());
     }
 
-    public CommandError create(Context context) {
+    public CommandError create(Context<?> context) {
         return create(context.command, context.currentToken());
     }
 }

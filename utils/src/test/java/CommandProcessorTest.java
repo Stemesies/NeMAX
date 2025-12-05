@@ -6,12 +6,12 @@ import utils.Ansi;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static cli.CommandResults.COMMAND_NOT_FOUND;
-import static cli.CommandResults.FURTHER_SUBCOMMANDS_EXPECTED;
-import static cli.CommandResults.INVALID_SUBCOMMAND;
-import static cli.CommandResults.MISSING_REQUIRED_ARGUMENT;
-import static cli.CommandResults.UNEXPECTED_SYMBOL;
-import static cli.CommandResults.UNKNOWN_SUBCOMMAND;
+import static cli.CommandErrors.COMMAND_NOT_FOUND;
+import static cli.CommandErrors.FURTHER_SUBCOMMANDS_EXPECTED;
+import static cli.CommandErrors.INVALID_SUBCOMMAND;
+import static cli.CommandErrors.MISSING_REQUIRED_ARGUMENT;
+import static cli.CommandErrors.UNEXPECTED_SYMBOL;
+import static cli.CommandErrors.UNKNOWN_SUBCOMMAND;
 
 public class CommandProcessorTest {
 
