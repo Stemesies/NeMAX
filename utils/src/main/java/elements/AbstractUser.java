@@ -63,4 +63,6 @@ public abstract class AbstractUser {
 
     public abstract void setPassword(String password);
 
+    public abstract void addFriend(int id);
+
 }

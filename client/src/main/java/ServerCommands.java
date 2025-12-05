@@ -26,8 +26,6 @@ public class ServerCommands {
     ServerContextData data = new ServerContextData(/*clientMain, clientMain.user, clientMain.group*/);
 
     void registerMsg() {
-//        var clientMain = new ClientMain("127.0.0.1", 8080);
-
         System.out.println("you are logged out! Please, log in or register your account.");
 
     }
@@ -35,12 +33,13 @@ public class ServerCommands {
     FriendRequest friendRequestMsg() {
         var request = new FriendRequest();
 
-        System.out.printf("You send a friend request from user %s\n! Are you want to approve it?",
+        System.out.printf("You received a friend request from user %s\n! Are you want to approve it?",
                 data.user.getUserName());
         Scanner responseInput = new Scanner(System.in);
+        String resp = "";
 
         if (responseInput.hasNextLine()) {
-            String resp = responseInput.nextLine();
+            resp = responseInput.nextLine();
 
             if (resp.equals("y")) {
                 request.requested = true;
@@ -48,9 +47,12 @@ public class ServerCommands {
             } else if (resp.equals("n")) {
                 request.requested = false;
                 request.isResponsed = true;
-            } else request.isResponsed = false;
+            } else {
+                request.isResponsed = false;
+            }
         }
 
+        responseInput.close();
         return request;
     }
 
@@ -68,5 +70,25 @@ public class ServerCommands {
 
     void sendMsgIntoChat() {
         System.out.printf("Your message was send by chat %s\n", data.group.getGroupName());
+    }
+
+    void initFriendResponse() {
+        var req = friendRequestMsg();
+        if (!req.isResponsed)
+            throw new Error(); // Ошибка: получена неверная команда.
+        var answer = req.requested ? "y" : "n";
+        processor.register("friend", (a) -> a
+                .description("add user to your friends or not?")
+                .requireArgument(answer)
+                .subcommand("add", (b) -> b
+                        .description("Add user to friends"))
+                .subcommand("cancel", (c) -> c
+                        .description("cancel friend request"))
+                .executes((success) -> {
+                    if (success.getString(answer).equals("y")) {
+                        success.data.user.addFriend(req.friendId);
+                    }
+                })
+        );
     }
 }
