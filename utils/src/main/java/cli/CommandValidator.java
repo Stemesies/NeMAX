@@ -20,17 +20,17 @@ public class CommandValidator {
      * </ul>
      *
      * <br>По завершении, если команда была отсеяна, программа составляет экземпляр
-     * исключения {@link CommandResult}. В него записывается что именно пошло не так
-     * (Получить информацию можно через {@link CommandResult#explain()}).
+     * исключения {@link CommandError}. В него записывается что именно пошло не так
+     * (Получить информацию можно через {@link CommandError#explain()}).
      * Данное сообщение пригодно для показа пользователю.
      *
      * @param command Команда для проверки
-     * @return {@link CommandResult}, если команда не прошла проверку
+     * @return {@link CommandError}, если команда не прошла проверку
      *     <br><code>null</code> иначе.
      */
-    public static CommandResult validate(String command) {
+    public static CommandError validate(String command) {
         if (command.isEmpty())
-            return new CommandResult(EMPTY_COMMAND, command, 0, 0);
+            return new CommandError(EMPTY_COMMAND, command, 0, 0);
 
         var parserOutput = CommandProcessor.pattern
             .matcher(command)
@@ -48,21 +48,21 @@ public class CommandValidator {
                 if (i == parserOutput.size() - 1)
                     return null;
                 else {
-                    return new CommandResult(NO_SEPARATION,
+                    return new CommandError(NO_SEPARATION,
                         command, it.start(2) - 1, it.end(2) + 1);
                 }
 
             if (delimiter.charAt(0) == '"') {
 
                 if (command.charAt(it.start(2) - 1) == '\"')
-                    return new CommandResult(
+                    return new CommandError(
                         NO_SEPARATION,
                         command,
                         it.start(2),
                         it.end(2)
                     );
 
-                return new CommandResult(
+                return new CommandError(
                     UNCLOSED_QUOTE,
                     command,
                     it.start(2),
@@ -72,7 +72,7 @@ public class CommandValidator {
             }
 
             if (delimiter.charAt(0) != ' ')
-                return new CommandResult(
+                return new CommandError(
                     INVALID_SEPARATOR,
                     command,
                     it.start(2),
@@ -80,7 +80,7 @@ public class CommandValidator {
                 );
 
             if (delimiter.length() > 1)
-                return new CommandResult(
+                return new CommandError(
                     UNEXPECTED_SYMBOL,
                     command,
                     it.start(2) + 1,

@@ -8,11 +8,6 @@ import utils.Ansi;
 
 public class ClientCommands {
 
-    private static final Condition<ClientContextData> requireAuth =
-        new Condition<>("You aren't logged in.", (ctx) ->
-            ctx.data.isAuthenticated()
-        );
-
     public static class ClientContextData extends ContextData {
         public Client client;
         public User user;
@@ -29,7 +24,12 @@ public class ClientCommands {
         }
     }
 
-    public static CustomCommandProcessor<ClientContextData> processor =
+    private static final Condition<ClientContextData> requireAuth =
+        new Condition<>("You aren't logged in.", (ctx) ->
+            ctx.data.isAuthenticated()
+        );
+
+    public static final CustomCommandProcessor<ClientContextData> processor =
         new CustomCommandProcessor<>();
 
     public static void init() {
@@ -47,7 +47,11 @@ public class ClientCommands {
             .requireArgument("username")
             .requireArgument("password")
             .executes((ctx) ->
-                ctx.out.println("Register")
+                ctx.data.client.user = User.register(
+                    ctx.out,
+                    ctx.getString("username"),
+                    ctx.getString("password")
+                )
             )
         );
         processor.register("login", (a) -> a
@@ -58,7 +62,11 @@ public class ClientCommands {
             .requireArgument("username")
             .requireArgument("password")
             .executes((ctx) ->
-                ctx.out.println("Login")
+                User.logIn(
+                    ctx.out,
+                    ctx.getString("username"),
+                    ctx.getString("password")
+                )
             )
         );
         processor.register("logout", (a) -> a
@@ -89,17 +97,7 @@ public class ClientCommands {
                 var password = ctx.getString("password");
                 var again = ctx.getString("passwordAgain");
 
-                if (!ctx.data.user.getPassword().equals(old)) {
-                    ctx.out.println(Ansi.Colors.RED.apply("Invalid password."));
-                    return;
-                }
-
-                if (!password.equals(again)) {
-                    ctx.out.println(Ansi.Colors.RED.apply("Passwords do not match."));
-                    return;
-                }
-                ctx.out.println("Successfully changed password.");
-                // TODO: смена пароля
+                ctx.data.user.changePassword(ctx.out, old, password, again);
             })
         );
         processor.register("profile", (a) -> a

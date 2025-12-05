@@ -17,7 +17,7 @@ import static cli.CommandResults.NOT_A_COMMAND;
 public class CustomCommandProcessor<T extends ContextData> {
 
     private final StringPrintWriter output = new StringPrintWriter();
-    private CommandResult lastError = null;
+    private CommandError lastError = null;
     private final ArrayList<Command<T>> registeredCommands = new ArrayList<>();
 
     static final Pattern pattern = Pattern.compile(
@@ -39,7 +39,7 @@ public class CustomCommandProcessor<T extends ContextData> {
      *     {@link #execute(String, ContextData)} завершился неудачей
      *     <br><code>null</code>, если все прошло успешно
      */
-    public CommandResult getLastError() {
+    public CommandError getLastError() {
         return lastError;
     }
 
@@ -89,16 +89,16 @@ public class CustomCommandProcessor<T extends ContextData> {
      * @return true, если команда была успешно выполнена.
      *     <br>false, если возникла ошибка
      */
-    public CommandResult execute(String input, T contextData) {
+    public CommandError execute(String input, T contextData) {
         output.clear();
 
         if (input.charAt(0) != '/') {
-            lastError = new CommandResult(NOT_A_COMMAND, input, 0, input.length());
+            lastError = new CommandError(NOT_A_COMMAND, input, 0, input.length());
             return lastError;
         }
 
         if (input.equals("/")) {
-            lastError = new CommandResult(NOT_A_COMMAND, input, 0, input.length());
+            lastError = new CommandError(NOT_A_COMMAND, input, 0, input.length());
             return lastError;
         }
 
@@ -115,7 +115,7 @@ public class CustomCommandProcessor<T extends ContextData> {
                 return lastError;
             }
 
-        return new CommandResult(COMMAND_NOT_FOUND, input, firstToken);
+        return new CommandError(COMMAND_NOT_FOUND, input, firstToken);
     }
 
     private void createHelpCommand() {

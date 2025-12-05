@@ -68,7 +68,8 @@ public class ClientMain {
             var msg = in.nextLine();
 
             if (msg.charAt(0) == '/') {
-                var procError = commandProcessor.execute(msg, null);
+                commandProcessor.execute(msg, null);
+                var procError = commandProcessor.getLastError();
                 var procOutput = commandProcessor.getOutput();
                 if (procError != null) {
                     if (procError.type == CommandResults.COMMAND_NOT_FOUND)

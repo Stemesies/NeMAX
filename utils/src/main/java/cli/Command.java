@@ -65,7 +65,7 @@ public class Command<T extends ContextData> {
      * @see Command.Builder#requireArgument(String)
      * @see Command.Builder#findArgument(String)
      */
-    private CommandResult consumeArguments(Context<T> context, int limit) {
+    private CommandError consumeArguments(Context<T> context, int limit) {
         context.position++; // Переходим на позицию первого аргумента
 
         for (var argument : arguments) {
@@ -81,7 +81,7 @@ public class Command<T extends ContextData> {
             if (argument.isOptional)
                 return null;
 
-            return new CommandResult(MISSING_REQUIRED_ARGUMENT,
+            return new CommandError(MISSING_REQUIRED_ARGUMENT,
                 context.command,
                 context.getToken(context.position - 1).end(),
                 context.currentToken() == null
@@ -94,7 +94,7 @@ public class Command<T extends ContextData> {
         return null;
     }
 
-    public CommandResult execute(Context<T> context) {
+    public CommandError execute(Context<T> context) {
         var token = context.currentToken();
         if (token == null)
             throw new NullPointerException("Null token. Position %d. Available [0;%d)."
@@ -102,11 +102,11 @@ public class Command<T extends ContextData> {
             );
 
         if (!token.is(base))
-            return new CommandResult(INVALID_TOKEN, context);
+            return new CommandError(INVALID_TOKEN, context);
 
         for (Condition<T> condition : conditions) {
             if (!condition.checker.check(context))
-                return new CommandResult(null, CUSTOM_ERROR, condition.message);
+                return new CommandError(null, CUSTOM_ERROR, condition.message);
         }
 
         // Ищем позицию, на которой располагается следующая суб-команда:
@@ -138,7 +138,7 @@ public class Command<T extends ContextData> {
         if (action != null) {
 
             if (context.currentToken() != null)
-                return new CommandResult(UNKNOWN_SUBCOMMAND, context);
+                return new CommandError(UNKNOWN_SUBCOMMAND, context);
 
             action.run(context);
             return null;
@@ -146,10 +146,10 @@ public class Command<T extends ContextData> {
 
         var lastToken = context.currentToken();
         if (lastToken != null)
-            return new CommandResult(INVALID_SUBCOMMAND, context);
+            return new CommandError(INVALID_SUBCOMMAND, context);
 
         var end = context.command.length();
-        return new CommandResult(FURTHER_SUBCOMMANDS_EXPECTED, context.command, end, end + 10);
+        return new CommandError(FURTHER_SUBCOMMANDS_EXPECTED, context.command, end, end + 10);
 
     }
 

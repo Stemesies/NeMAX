@@ -3,14 +3,14 @@ package cli;
 import cli.utils.Token;
 import utils.Ansi;
 
-public class CommandResult {
+public class CommandError {
 
     public final String message;
     public final CommandResults type;
     public final int start;
     public final int end;
 
-    CommandResult(CommandResults type, String command, int start, int end, Object... args) {
+    CommandError(CommandResults type, String command, int start, int end, Object... args) {
         this.type = type;
         this.start = start;
         this.end = end;
@@ -26,7 +26,7 @@ public class CommandResult {
      * @param type тип ошибки (см. {@link CommandResults})
      * @param args аргументы для форматирования строки, если таковые нужны
      */
-    public CommandResult(String command, CommandResults type, Object... args) {
+    public CommandError(String command, CommandResults type, Object... args) {
         this.type = type;
         this.start = 0;
         this.end = 0;
@@ -35,7 +35,7 @@ public class CommandResult {
             + (command == null ? "" : "\n" + command);
     }
 
-    CommandResult(CommandResults type, String command, Token token, Object... args) {
+    CommandError(CommandResults type, String command, Token token, Object... args) {
         this(type, command, token.start(), token.end(), args);
     }
 
@@ -44,7 +44,7 @@ public class CommandResult {
      *
      * @param type тип ошибки (см. {@link CommandResults})
      */
-    public CommandResult(CommandResults type, Context<?> context, Object... args) {
+    public CommandError(CommandResults type, Context<?> context, Object... args) {
         this(type, context.command, context.currentToken(), args);
     }
 

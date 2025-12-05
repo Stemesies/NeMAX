@@ -3,12 +3,25 @@ package elements;
 import managers.FriendManager;
 import managers.JoinManager;
 import managers.RegisterManager;
+import utils.Ansi;
+import utils.StringPrintWriter;
 
 import java.util.ArrayList;
 
 public class User extends AbstractUser {
 
     ArrayList<? extends SuperRequest> requests;
+
+    public static User register(StringPrintWriter out, String username, String password) {
+        out.println("Not realized.");
+        // TODO: регистрация
+        return null;
+    }
+
+    public static void logIn(StringPrintWriter out, String username, String password) {
+        out.println("Not realized.");
+        // TODO: вход
+    }
 
     @Override
     public void sendMessage(String text, int id) {
@@ -59,5 +72,20 @@ public class User extends AbstractUser {
 
     public void sendFriendRequest(String username) {
 
+    }
+
+    public void changePassword(StringPrintWriter out, String old, String password, String again) {
+        if (!this.getPassword().equals(old)) {
+            out.println(Ansi.Colors.RED.apply("Invalid password."));
+            return;
+        }
+
+        if (!password.equals(again)) {
+            out.println(Ansi.Colors.RED.apply("Passwords do not match."));
+            return;
+        }
+
+        // TODO: Изменение пароля
+        out.println("Successfully changed password.");
     }
 }

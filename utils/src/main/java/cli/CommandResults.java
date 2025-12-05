@@ -33,15 +33,15 @@ public enum CommandResults {
         return message;
     }
 
-    public CommandResult create(String command, int start, int end) {
-        return new CommandResult(this, command, start, end);
+    public CommandError create(String command, int start, int end) {
+        return new CommandError(this, command, start, end);
     }
 
-    public CommandResult create(String command, Token token) {
-        return new CommandResult(this, command, token.start(), token.end());
+    public CommandError create(String command, Token token) {
+        return new CommandError(this, command, token.start(), token.end());
     }
 
-    public CommandResult create(Context context) {
+    public CommandError create(Context context) {
         return create(context.command, context.currentToken());
     }
 }
