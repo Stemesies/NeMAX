@@ -196,7 +196,7 @@ public class Command<T extends ContextData> {
         /**
          * Позволяет заявить команде /help, что данная команда существует.
          * При этом ее нельзя будет вызвать:
-         * процессор будет выдавать ошибку {@link CommandResults#COMMAND_NOT_FOUND}.
+         * процессор будет выдавать ошибку {@link CommandResults#PHANTOM_COMMAND}.
          * <br>
          * <br> !! Данный метод не должен применяться к суб-командам !!
          *
@@ -215,17 +215,28 @@ public class Command<T extends ContextData> {
          * Устанавливает условие, при котором команда должна
          * запускаться или проходить дальше по иерархии.
          *
+         * @param condition условие прохода
+         * @throws IllegalStateException если команда фантомная.
+         */
+        public Builder<T> require(Condition<T> condition) throws IllegalStateException {
+            if (isPhantom != null)
+                throw new IllegalStateException(
+                    "Conditions should not be used for phantom commands."
+                );
+            this.conditions.add(condition);
+            return this;
+        }
+
+        /**
+         * Устанавливает условие, при котором команда должна
+         * запускаться или проходить дальше по иерархии.
+         *
          * @param onFailure сообщение, выводимое при отсутствии необходимых условий.
          * @param condition условие прохода
          * @throws IllegalStateException если команда фантомная.
          */
         public Builder<T> require(String onFailure, Check condition) throws IllegalStateException {
-            if (isPhantom != null)
-                throw new IllegalStateException(
-                    "Conditions should not be used for phantom commands."
-                );
-            this.conditions.add(new Condition<>(onFailure, condition));
-            return this;
+            return require(new Condition<>(onFailure, condition));
         }
 
         /**
@@ -236,12 +247,7 @@ public class Command<T extends ContextData> {
          * @param condition условие прохода
          */
         public Builder<T> require(String onFailure, CheckIf<Context<T>> condition) {
-            if (isPhantom != null)
-                throw new IllegalStateException(
-                    "Conditions should not be used for phantom commands."
-                );
-            this.conditions.add(new Condition<>(onFailure, condition));
-            return this;
+            return require(new Condition<>(onFailure, condition));
         }
 
         /**

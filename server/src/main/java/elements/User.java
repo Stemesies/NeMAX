@@ -18,9 +18,10 @@ public class User extends AbstractUser {
         return null;
     }
 
-    public static void logIn(StringPrintWriter out, String username, String password) {
+    public static User logIn(StringPrintWriter out, String username, String password) {
         out.println("Not realized.");
         // TODO: вход
+        return null;
     }
 
     @Override

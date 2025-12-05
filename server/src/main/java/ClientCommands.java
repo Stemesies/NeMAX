@@ -56,11 +56,13 @@ public class ClientCommands {
             .require("You are already logged in.", (ctx) -> !ctx.data.isAuthenticated())
             .requireArgument("username")
             .requireArgument("password")
-            .executes((ctx) -> User.logIn(
+            .executes((ctx) ->
+                ctx.data.client.user = User.logIn(
                     ctx.out,
                     ctx.getString("username"),
                     ctx.getString("password")
-            ))
+                )
+            )
         );
         processor.register("logout", (a) -> a
             .description("Выход из учетной записи")
