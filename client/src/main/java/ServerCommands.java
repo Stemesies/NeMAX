@@ -2,6 +2,7 @@ import cli.CustomCommandProcessor;
 import elements.Client;
 import elements.Group;
 import elements.User;
+import network.SimpleSocket;
 import requests.FriendRequest;
 
 import java.util.Scanner;
@@ -13,9 +14,10 @@ public class ServerCommands {
         public Client client;
         public User user;
         public Group group;
-        FriendRequest request;
+        public FriendRequest request;
+        public SimpleSocket socket;
 
-        public ServerContextData(/*Client client, User user, Group group, FriendRequest request*/) {
+        public ServerContextData(/*Client client, User user, Group group, FriendRequest request, SimpleSocket socket*/) {
 //            this.client = client;
 //            this.user = user;
 //            this.group = group;
@@ -25,9 +27,9 @@ public class ServerCommands {
 
     public static final CustomCommandProcessor<ServerContextData> processor = new CustomCommandProcessor<>();
 
-    ServerContextData data = new ServerContextData(/*clientMain, clientMain.user, clientMain.group*/);
+    public static ServerContextData data = new ServerContextData(/*clientMain, clientMain.user, clientMain.group*/);
 
-    void registerMsg() {
+    static void registerMsg() {
         System.out.println("you are logged out! Please, log in or register your account.");
 
     }
@@ -43,13 +45,13 @@ public class ServerCommands {
             resp = responseInput.nextLine();
 
             if (resp.equals("y")) {
-                this.data.request.requested = true;
-                this.data.request.isResponsed = true;
+                data.request.requested = true;
+                data.request.isResponsed = true;
             } else if (resp.equals("n")) {
-                this.data.request.requested = false;
-                this.data.request.isResponsed = true;
+                data.request.requested = false;
+                data.request.isResponsed = true;
             } else {
-                this.data.request.isResponsed = false;
+                data.request.isResponsed = false;
             }
         }
 
@@ -68,11 +70,7 @@ public class ServerCommands {
         System.out.println("User has deleted from your friends.");
     }
 
-    void sendMsgIntoChat() {
-        System.out.printf("Your message was send by chat %s\n", data.group.getGroupName());
-    }
-
-    void initFriendResponse() {
+    private static void initFriendResponse() {
         processor.register("friend", (a) -> a
                 .description("add user to your friends or not?")
                 .subcommand("add", (b) -> b
@@ -82,13 +80,39 @@ public class ServerCommands {
                         }))
                 .requireArgument("argumentName")
         );
+        processor.register("friend", (a) -> a
+                .description("Delete friend")
+                .subcommand("del", (b) -> b
+                        .executes((deletion) -> {
+                            System.out.println(deletion.getString("argument"));
+                        })
+                ).requireArgument("argument")
+        );
+
     }
 
-    void initRegisterResponse() {
+    private static void initRegisterResponse() {
         processor.register("register", (a) -> a
                 .description("s")
                 .subcommand("request", (b) -> b
-                        .executes(this::registerMsg))
+                        .executes(ServerCommands::registerMsg))
         );
+    }
+
+    public static void initGroupResponse() {
+        processor.register("chat", (a) -> a
+                .description("Send id of open chat.")
+                .subcommand("fetch", (b) -> b
+                        .executes((id) -> {
+                            data.socket.sendMessage("/response chat" + id);
+                        })
+                )
+        );
+    }
+
+    public static void initGeneral() {
+        initFriendResponse();
+        initRegisterResponse();
+        initGroupResponse();
     }
 }

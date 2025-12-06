@@ -121,6 +121,7 @@ public class ClientMain {
     }
 
     public static void main(String[] args) {
+        ServerCommands.initGeneral();
         var client = new ClientMain("127.0.0.1", 8080);
         client.connect();
         client.processInput();
