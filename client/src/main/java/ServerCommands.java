@@ -107,8 +107,8 @@ public class ServerCommands {
         processor.register("chat", (a) -> a
                 .description("Send id of open chat.")
                 .subcommand("fetch", (b) -> b
-                        .executes(() -> {
-                            data.socket.sendMessage("/response chat" + data.group.getIdGroup());
+                        .executes((c) -> {
+                            c.data.socket.sendMessage("/response chat" + c.data.group.getIdGroup());
                         })
                 )
         );
@@ -116,8 +116,8 @@ public class ServerCommands {
                 .description("Add new message to unread.")
                 .subcommand("new", (b) -> b
                         .executes((msg) -> {
-                            if (!data.group.getGroupName().equals(msg.getString("groupId"))) {
-                                data.client.addUnreadMsg(msg.getString("groupId"), msg.getString("message"));
+                            if (!msg.data.group.getGroupName().equals(msg.getString("groupId"))) {
+                                msg.data.client.addUnreadMsg(msg.getString("groupId"), msg.getString("message"));
                                 newMessageMsg();
                             }
                         })

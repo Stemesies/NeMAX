@@ -59,10 +59,21 @@ public class Client {
         return socket.receiveMessage();
     }
 
+    /**
+     * Добавляет непрочитанное сообщение в контейнер непрочитанных. <br>
+     * Сохраняет данные по ключу #groupName
+     *
+     * @param groupName - "строковый" id группы
+     * @param msg - новое сообщение
+     */
     public void addUnreadMsg(String groupName, Object msg) {
-//        Integer key = group.id;
         ArrayList<String> unread = this.map.get(groupName);
         unread.add(msg.toString());
+        this.map.put(groupName, unread);
+    }
+
+    public void readMessage() {
+
     }
 
 }
