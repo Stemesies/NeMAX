@@ -69,7 +69,8 @@ public class ClientMain {
             var msg = in.nextLine();
 
             if (msg.charAt(0) == '/') {
-                commandProcessor.execute(msg, null);
+                commandProcessor.execute(msg,
+                        new ServerCommands.ServerContextData(null, null, null, null, socket));
                 var procError = commandProcessor.getLastError();
                 var procOutput = commandProcessor.getOutput();
                 if (procError != null) {

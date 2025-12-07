@@ -5,8 +5,6 @@ import elements.User;
 import network.SimpleSocket;
 import requests.FriendRequest;
 
-import java.util.Scanner;
-
 @SuppressWarnings("checkstyle:LineLength")
 public class ServerCommands {
 
@@ -17,45 +15,19 @@ public class ServerCommands {
         public FriendRequest request;
         public SimpleSocket socket;
 
-        public ServerContextData(/*Client client, User user, Group group, FriendRequest request, SimpleSocket socket*/) {
-//            this.client = client;
-//            this.user = user;
-//            this.group = group;
-//            this.request = request;
-//            this.socket = socket;
+        public ServerContextData(Client client, User user, Group group, FriendRequest request, SimpleSocket socket) {
+            this.client = client;
+            this.user = user;
+            this.group = group;
+            this.request = request;
+            this.socket = socket;
         }
     }
 
     public static final CustomCommandProcessor<ServerContextData> processor = new CustomCommandProcessor<>();
 
-    public static ServerContextData data = new ServerContextData();
-
     private static void registerMsg() {
         System.out.println("you are logged out! Please, log in or register your account.");
-    }
-
-    void friendRequestMsg() {
-
-        System.out.printf("You received a friend request from user %s\n! Are you want to approve it?",
-                data.user.getUserName());
-        Scanner responseInput = new Scanner(System.in);
-        String resp = "";
-
-        if (responseInput.hasNextLine()) {
-            resp = responseInput.nextLine();
-
-            if (resp.equals("y")) {
-                data.request.requested = true;
-                data.request.isResponsed = true;
-            } else if (resp.equals("n")) {
-                data.request.requested = false;
-                data.request.isResponsed = true;
-            } else {
-                data.request.isResponsed = false;
-            }
-        }
-
-        responseInput.close();
     }
 
     void friendAddMsg() {
