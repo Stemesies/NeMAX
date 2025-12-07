@@ -28,9 +28,9 @@ public class ServerCommands {
 
     public static final CustomCommandProcessor<ServerContextData> processor = new CustomCommandProcessor<>();
 
-    public static ServerContextData data = new ServerContextData(/*clientMain, clientMain.user, clientMain.group*/);
+    public static ServerContextData data = new ServerContextData();
 
-    static void registerMsg() {
+    private static void registerMsg() {
         System.out.println("you are logged out! Please, log in or register your account.");
     }
 
@@ -70,7 +70,7 @@ public class ServerCommands {
         System.out.println("User has deleted from your friends.");
     }
 
-    static void newMessageMsg() {
+    private static void newMessageMsg() {
         System.out.println("You have new massage!");
     }
 
@@ -103,12 +103,12 @@ public class ServerCommands {
         );
     }
 
-    public static void initGroupResponse() {
+    private static void initGroupResponse() {
         processor.register("chat", (a) -> a
                 .description("Send id of open chat.")
                 .subcommand("fetch", (b) -> b
                         .executes((c) -> {
-                            c.data.socket.sendMessage("/response chat" + c.data.group.getIdGroup());
+                            c.data.socket.sendMessage("/response chat " + c.data.group.getIdGroup());
                         })
                 )
         );
@@ -123,6 +123,15 @@ public class ServerCommands {
                         })
                         .requireArgument("groupId")
                         .requireArgument("message")
+                )
+        );
+        processor.register("chat", (a) -> a
+                .description("User open chat with unread messages.")
+                .subcommand("read", (b) -> b
+                        .executes((msg) -> {
+                            msg.data.client.readMessage(msg.getString("groupId"));
+                        })
+                        .requireArgument("groupId")
                 )
         );
     }

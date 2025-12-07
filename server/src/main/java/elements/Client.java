@@ -72,8 +72,13 @@ public class Client {
         this.map.put(groupName, unread);
     }
 
-    public void readMessage() {
-
+    /**
+     * Удаляет сообщения из непрочитанных при открытии группы.
+     *
+     * @param groupName - "строковый" id открытой группы
+     */
+    public void readMessage(String groupName) {
+        this.map.remove(groupName);
     }
 
 }
