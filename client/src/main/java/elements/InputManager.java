@@ -1,7 +1,6 @@
 package elements;
 
 import cli.CommandProcessor;
-import network.SimpleSocket;
 
 import java.util.Scanner;
 
@@ -10,11 +9,10 @@ import static cli.CommandResults.PHANTOM_COMMAND;
 public class InputManager {
 
     private final CommandProcessor commandProcessor = new CommandProcessor();
-    private SimpleSocket socket = null;
     private final Scanner in = new Scanner(System.in);
 
     boolean isConnected() {
-        return socket != null;
+        return ServerConnectManager.socket != null;
     }
 
     public void exit() {
@@ -27,14 +25,15 @@ public class InputManager {
      * Все потоки, работающие с ним также будут автоматически остановлены.
      */
     public void disconnect() {
-        if (socket == null)
+        if (ServerConnectManager.socket == null)
             return;
 
-        socket.close();
-        socket = null;
+        ServerConnectManager.socket.close();
+        ServerConnectManager.socket = null;
         System.out.println("Disconnected from the server");
     }
 
+    @SuppressWarnings("checkstyle:LineLength")
     public void processInput() {
         while (true) {
 
@@ -46,7 +45,8 @@ public class InputManager {
 
             if (msg.charAt(0) == '/') {
                 commandProcessor.execute(msg,
-                        new ServerCommands.ServerContextData(null, null, null, null, socket));
+                        new ServerCommands.ServerContextData()
+                );
                 var procError = commandProcessor.getLastError();
                 var procOutput = commandProcessor.getOutput();
                 if (procError != null) {
@@ -66,7 +66,7 @@ public class InputManager {
 
     private void send(String msg) {
         if (isConnected())
-            socket.sendMessage(msg);
+            ServerConnectManager.socket.sendMessage(msg);
         else
             System.err.println("Not connected to server.");
     }

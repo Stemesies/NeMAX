@@ -11,7 +11,7 @@ public class Client {
 
     static InputManager input = new InputManager();
 
-    public HashMap<String, ArrayList<String>> map = new HashMap<>(20);
+    public static HashMap<String, ArrayList<String>> map = new HashMap<>(20);
 
     public static void launch() {
         scm.connect();
@@ -25,10 +25,10 @@ public class Client {
      * @param groupName - "строковый" id группы
      * @param msg - новое сообщение
      */
-    public void addUnreadMsg(String groupName, Object msg) {
-        ArrayList<String> unread = this.map.get(groupName);
+    public static void addUnreadMsg(String groupName, Object msg) {
+        ArrayList<String> unread = map.get(groupName);
         unread.add(msg.toString());
-        this.map.put(groupName, unread);
+        map.put(groupName, unread);
     }
 
     /**
@@ -36,7 +36,7 @@ public class Client {
      *
      * @param groupName - "строковый" id открытого чата
      */
-    public void readMessage(String groupName) {
-        this.map.remove(groupName);
+    public static void readMessage(String groupName) {
+        map.remove(groupName);
     }
 }

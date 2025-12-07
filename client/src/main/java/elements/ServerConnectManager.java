@@ -8,7 +8,7 @@ public class ServerConnectManager {
     public final String host;
     public final int port;
 
-    private SimpleSocket socket = null;
+    public static SimpleSocket socket = null;
     private final CommandProcessor commandProcessor = new CommandProcessor();
 
     public ServerConnectManager(String host, int port) {
