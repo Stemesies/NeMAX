@@ -153,13 +153,34 @@ public class User extends AbstractUser {
 
     @Override
     public void setName(String name) {
-        this.name = name;
-        // TODO: обновление базы данных.
+        String sql = "UPDATE users SET name = ? WHERE id = ?";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, name);
+            stmt.setInt(2, this.id);
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            System.err.println("Error updating User`s name: " + e.getMessage());
+        }
     }
 
     @Override
     public void setPassword(String password) {
+        String sql = "UPDATE users SET password = ? WHERE id = ?";
 
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, password);
+            stmt.setInt(2, this.id);
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            System.err.println("Error updating User`s password: " + e.getMessage());
+        }
     }
 
 //    public void activateManager() {
@@ -210,11 +231,13 @@ public class User extends AbstractUser {
         }
 
         this.password = password;
+        setPassword(password);
         out.println("Successfully changed password.");
     }
 
     @SuppressWarnings("checkstyle:LineLength")
     public String getProfile() {
+        // FIXME
         var connectedCommand = CollectionExt.findBy(ServerData.getClients(), (it) -> it.user == this);
         var onlineMode = connectedCommand == null ? "" : " • online";
 
@@ -242,7 +265,6 @@ public class User extends AbstractUser {
 
     // Возможно переименование в setName
     public void changeName(StringPrintWriter out, String nickname) {
-        // TODO: смена имени
         setName(nickname);
         out.println("Successfully changed nickname.");
     }
