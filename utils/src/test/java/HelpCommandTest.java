@@ -28,6 +28,19 @@ public class HelpCommandTest {
 
         assertHelp("/help <subcommands> - выводит все доступные команды\n");
 
+        processor.register("invis", (rc)->rc
+            .isInvisible()
+            .executes(()->{})
+        );
+
+        assertHelp("/help <subcommands> - выводит все доступные команды\n");
+
+        Assertions.assertTrue(execute(processor, "/help invis"));
+        Assertions.assertEquals(
+            Ansi.applyStyle( "Unknown command invis.", Ansi.Colors.RED) + "\n",
+            processor.getOutput()
+        );
+
         processor.register("noDescription", (rc)->rc
             .executes(()->{})
         );

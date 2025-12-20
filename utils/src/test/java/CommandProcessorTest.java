@@ -62,6 +62,39 @@ public class CommandProcessorTest {
         Assertions.assertEquals(COMMAND_NOT_FOUND, processor.getLastError().type);
     }
 
+    @Test
+    public void invisibleCommand() {
+        var processor = new CommandProcessor();
+
+        processor.register("invisible", (rc) -> rc
+            .isInvisible()
+            .executes(()->{})
+        );
+
+        processor.register("invisible2", (rc) -> rc
+            .isInvisible()
+            .requireArgument("arg1")
+            .subcommand("sub", it -> it
+                .executes(() -> {})
+            )
+        );
+
+        Assertions.assertTrue(execute(processor, "/invisible"));
+
+        Assertions.assertFalse(execute(processor, "/invisible amogus"));
+        Assertions.assertEquals(COMMAND_NOT_FOUND, processor.getLastError().type);
+
+        Assertions.assertTrue(execute(processor, "/invisible2 a sub"));
+
+        Assertions.assertFalse(execute(processor, "/invisible2 a"));
+        Assertions.assertEquals(COMMAND_NOT_FOUND, processor.getLastError().type);
+
+        Assertions.assertFalse(execute(processor, "/invisible2 sub"));
+        Assertions.assertEquals(COMMAND_NOT_FOUND, processor.getLastError().type);
+
+
+    }
+
     /**
      * Идет проверка на правильной работы суб-команд.
      */

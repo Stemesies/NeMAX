@@ -106,9 +106,14 @@ public class CommandProcessor {
 
             if (command.isPhantom != null)
                 return command.isPhantom;
-            else
-                return command.execute(new Command.Context(output, tokens, input, null, null)
-                );
+
+            var context = new Command.Context(output, tokens, input, null, null);
+            if (command.isInvisible) {
+                return command.execute(context) != null
+                    ? new CommandResult(COMMAND_NOT_FOUND, input, firstToken)
+                    : null;
+            }
+            return command.execute(context);
         }
 
         return new CommandResult(COMMAND_NOT_FOUND, input, firstToken);
@@ -149,7 +154,7 @@ public class CommandProcessor {
                 }
 
             }
-            if (head == null) {
+            if (head == null || head.isInvisible) {
                 out.println(Ansi.applyStyle(
                     "Unknown command " + subcommand + ".", Ansi.Colors.RED
                 ));
@@ -180,8 +185,10 @@ public class CommandProcessor {
 
     private void printAllPossibleCommands(StringPrintWriter out) {
         registeredCommands.forEach(cmd -> {
-            out.print('/');
-            printCommand(out, cmd);
+            if (!cmd.isInvisible) {
+                out.print('/');
+                printCommand(out, cmd);
+            }
         });
     }
 

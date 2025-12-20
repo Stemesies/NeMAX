@@ -29,6 +29,7 @@ public class Command {
     final Apply<Context> action;
     final List<Condition> conditions;
 
+    final boolean isInvisible;
     final CommandResult isPhantom;
 
     private Command(
@@ -38,7 +39,8 @@ public class Command {
         List<Argument> arguments,
         Apply<Context> action,
         List<Condition> conditions,
-        CommandResult isPhantom
+        CommandResult isPhantom,
+        boolean isInvisible
     ) {
         this.base = base;
         this.helpDescription = helpDescription;
@@ -47,6 +49,7 @@ public class Command {
         this.action = action;
         this.conditions = conditions;
         this.isPhantom = isPhantom;
+        this.isInvisible = isInvisible;
     }
 
     public boolean is(Token token) {
@@ -297,6 +300,7 @@ public class Command {
         Apply<Context> action = null;
         ArrayList<Condition> conditions = new ArrayList<>();
         CommandResult isPhantom = null;
+        boolean isInvisible = false;
         boolean isBase = true;
 
         public Builder(String baseCommand) {
@@ -306,7 +310,7 @@ public class Command {
         /**
          * Позволяет заявить команде /help, что данная команда существует.
          * При этом ее нельзя будет вызвать:
-         * процессор будет выдавать ошибку {@link CommandResults#COMMAND_NOT_FOUND}.
+         * процессор будет выдавать ошибку {@link CommandResults#PHANTOM_COMMAND}.
          * <br>
          * <br> !! Данный метод не должен применяться к суб-командам !!
          *
@@ -324,7 +328,7 @@ public class Command {
         /**
          * Позволяет заявить команде /help, что данная команда существует.
          * При этом ее нельзя будет вызвать:
-         * процессор будет выдавать ошибку {@link CommandResults#COMMAND_NOT_FOUND}.
+         * процессор будет выдавать ошибку {@link CommandResults#PHANTOM_COMMAND}.
          * <br>
          * <br> !! Данный метод не должен применяться к суб-командам !!
          *
@@ -332,6 +336,24 @@ public class Command {
          */
         public Builder isPhantom() throws IllegalStateException {
             return isPhantom("Command is unavailable.");
+        }
+
+        /**
+         * Позволяет заявить команде /help, что данная команда отсутствует.<br>
+         * При этом, если команда написана неправильно, будет высвечиваться ошибка
+         * {@link CommandResults#COMMAND_NOT_FOUND}
+         * <br>
+         * <br> !! Данный метод не должен применяться к суб-командам !!
+         *
+         * @throws IllegalStateException Если метод был применен к суб-командам.
+         */
+        public Builder isInvisible() throws IllegalStateException {
+            if (!isBase)
+                throw new IllegalStateException(
+                    "isInvisible flag should not be set for subcommands."
+                );
+            isInvisible = true;
+            return this;
         }
 
         public Builder description(String helpDescription) {
@@ -480,7 +502,8 @@ public class Command {
                 arguments,
                 action,
                 conditions,
-                isPhantom
+                isPhantom,
+                isInvisible
             );
         }
     }
