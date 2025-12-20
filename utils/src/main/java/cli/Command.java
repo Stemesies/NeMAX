@@ -6,6 +6,7 @@ import utils.kt.Apply;
 import utils.kt.Check;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -74,10 +75,20 @@ public class Command {
 
         for (var argument : arguments) {
 
-            if (context.position < limit) {
-                context.arguments.put(argument.name, context.consumeToken());
+            if (argument.isArray) {
+                var list = new ArrayList<Token>();
+                while (context.position < limit) {
+                    list.add(context.consumeToken());
+                }
+                context.arguments.put(argument.name, list.toArray());
                 continue;
+            } else {
+                if (context.position < limit) {
+                    context.arguments.put(argument.name, context.consumeToken());
+                    continue;
+                }
             }
+
 
             // Мы дошли до следующей суб-команды (ака до лимита)
 
@@ -162,7 +173,7 @@ public class Command {
     public static class Context {
         
         public StringPrintWriter out;
-        public HashMap<String, Token> arguments = new HashMap<>();
+        public HashMap<String, Object> arguments = new HashMap<>();
 
         String command;
         AbstractUser user;
@@ -205,14 +216,39 @@ public class Command {
             return arguments.containsKey(argumentName);
         }
 
-        public String getString(String argumentName) throws NoSuchElementException {
+        public String getString(String argumentName)
+            throws NoSuchElementException, IllegalArgumentException {
             var argument = arguments.get(argumentName);
             if (argument == null)
                 throw new NoSuchElementException(
                     "No arguments with name \"" + argumentName + "\" found."
                 );
+            if (argument instanceof Token)
+                return ((Token) argument).content();
+            else throw new IllegalArgumentException(
+                "Tried to read String from Array argument \"" + argumentName + "\"."
+            );
+        }
 
-            return argument.content();
+        public List<String> getArray(String argumentName)
+            throws NoSuchElementException, IllegalArgumentException {
+            var argument = arguments.get(argumentName);
+            switch (argument) {
+                case null -> throw new NoSuchElementException(
+                    "No arguments with name \"" + argumentName + "\" found."
+                );
+                case Token ignored -> throw new IllegalArgumentException(
+                    "Tried to read String from Array argument \"" + argumentName + "\".");
+                case Object[] tokenArrayList -> {
+                    return Arrays.stream((tokenArrayList))
+                        .map((it) -> (Token) (it))
+                        .map(Token::content)
+                        .toList();
+                }
+                default -> throw new IllegalArgumentException("?");
+            }
+
+
         }
 
     }
@@ -230,10 +266,17 @@ public class Command {
     public static class Argument {
         String name;
         boolean isOptional;
+        boolean isArray = false;
 
         public Argument(String name, boolean isOptional) {
             this.name = name;
             this.isOptional = isOptional;
+        }
+
+        public Argument(String name, boolean isOptional, boolean isArray) {
+            this.name = name;
+            this.isOptional = isOptional;
+            this.isArray = isArray;
         }
 
         @Override
@@ -343,13 +386,29 @@ public class Command {
          */
         public Builder requireArgument(String name) {
             if (!arguments.isEmpty() && arguments.getLast().isOptional)
-                throw new IllegalStateException("Non-isOptional argument after isOptional.");
+                throw new IllegalStateException("Non-isOptional argument after optional.");
+            if (!arguments.isEmpty() && arguments.getLast().isArray)
+                throw new IllegalStateException("Can't specify arguments after Array argument");
 
             arguments.add(new Argument(name, false));
             return this;
         }
 
+        public Builder requireArrayArgument(String name) {
+            if (!arguments.isEmpty() && arguments.getLast().isOptional)
+                throw new IllegalStateException("Can't add Array argument after optional.");
+            if (!arguments.isEmpty() && arguments.getLast().isArray)
+                throw new IllegalStateException("Can't specify arguments after Array argument");
+
+
+            arguments.add(new Argument(name, false, true));
+            return this;
+        }
+
         public Builder findArgument(String name) {
+            if (!arguments.isEmpty() && arguments.getLast().isArray)
+                throw new IllegalStateException("Can't specify arguments after Array argument");
+
             arguments.add(new Argument(name, true));
             return this;
         }

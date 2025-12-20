@@ -72,6 +72,7 @@ public class CommandProcessor {
             result.explain();
             return false;
         }
+        System.out.print(getOutput());
 
         return true;
     }
@@ -107,7 +108,7 @@ public class CommandProcessor {
                 return command.isPhantom;
             else
                 return command.execute(new Command.Context(output, tokens, input, null, null)
-            );
+                );
         }
 
         return new CommandResult(COMMAND_NOT_FOUND, input, firstToken);
@@ -116,33 +117,63 @@ public class CommandProcessor {
     private void createHelpCommand() {
         register("help", it1 -> it1
             .description("выводит все доступные команды")
-            .findArgument("subcommand")
+            .requireArrayArgument("subcommands")
             .executes((ctx) -> {
-                if (ctx.hasArgument("subcommand"))
-                    printAllPossibleCommands(ctx.out, ctx.getString("subcommand"));
+                var list = ctx.getArray("subcommands");
+                if (!list.isEmpty())
+                    printAllPossibleCommands(ctx.out, list);
                 else
                     printAllPossibleCommands(ctx.out);
             })
         );
     }
 
-    private void printAllPossibleCommands(StringPrintWriter out, String subcommand) {
-        Command cmd = null;
-        for (var command : registeredCommands)
-            if (command.base.equals(subcommand)) {
-                cmd = command;
-                break;
+    private void printAllPossibleCommands(StringPrintWriter out, List<String> subcommands) {
+        var path = new ArrayList<Command>();
+        Command head = null;
+
+        for (String subcommand : subcommands) {
+            if (head == null) {
+                for (var command : registeredCommands) {
+                    if (!command.base.equals(subcommand)) continue;
+                    head = command;
+                    break;
+                }
+            } else {
+                var hd = head;
+                head = null;
+                for (var command : hd.subcommands) {
+                    if (!command.base.equals(subcommand)) continue;
+                    head = command;
+                    break;
+                }
+
             }
-        if (cmd == null) {
-            out.println(Ansi.applyStyle("Unknown command.", Ansi.Colors.RED));
-            return;
+            if (head == null) {
+                out.println(Ansi.applyStyle(
+                    "Unknown command " + subcommand + ".", Ansi.Colors.RED
+                ));
+                return;
+            }
+
+            path.add(head);
         }
-        if (cmd.action != null || cmd.isPhantom != null) {
+        if (head == null)
+            throw new IllegalArgumentException("?");
+
+        if (head.action != null || head.isPhantom != null) {
             out.print('/');
-            printCommand(out, cmd);
+            for (int i = 0; i < path.size() - 1; i++) {
+                out.print(path.get(i).base + " ");
+            }
+            printCommand(out, head);
         }
-        for (var scmd : cmd.subcommands) {
-            out.print("/" + cmd.base + " ");
+        for (var scmd : head.subcommands) {
+            out.print('/');
+            for (Command command : path) {
+                out.print(command.base + " ");
+            }
+
             printCommand(out, scmd);
         }
     }
