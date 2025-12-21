@@ -33,6 +33,9 @@ public class InputManager {
         System.out.println("Disconnected from the server");
     }
 
+    /**
+     * Получение сообщения от клиента.
+     */
     @SuppressWarnings("checkstyle:LineLength")
     public void processInput() {
         while (true) {
@@ -44,9 +47,7 @@ public class InputManager {
             var msg = in.nextLine();
 
             if (msg.charAt(0) == '/') {
-                commandProcessor.execute(msg,
-                        new ServerCommands.ServerContextData()
-                );
+                commandProcessor.execute(msg, null);
                 var procError = commandProcessor.getLastError();
                 var procOutput = commandProcessor.getOutput();
                 if (procError != null) {
@@ -70,5 +71,4 @@ public class InputManager {
         else
             System.err.println("Not connected to server.");
     }
-
 }

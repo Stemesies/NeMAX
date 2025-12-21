@@ -51,6 +51,9 @@ public class ServerConnectManager {
         return socket == null;
     }
 
+    /**
+     * Создание потока для подключения к серверу.
+     */
     public void processConnection() {
         new Thread(() -> {
             while (isConnected()) {
@@ -69,6 +72,9 @@ public class ServerConnectManager {
         System.exit(0);
     }
 
+    /**
+     * Регистрирует команды для соединения с сервером.
+     */
     private void registerClientsideCommands() {
 
         commandProcessor.register("exit", (it) -> it
@@ -78,6 +84,5 @@ public class ServerConnectManager {
                 .require("Already connected.", this::isDisconnected)
                 .executes(this::connect)
         );
-
     }
 }

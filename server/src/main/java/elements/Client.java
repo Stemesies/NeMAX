@@ -2,8 +2,6 @@ package elements;
 
 import network.SimpleSocket;
 
-import javax.management.MBeanServerConnection;
-
 /**
  * Репрезентация клиента со стороны сервера.
  * <br>Содержит в себе всю информацию о подключении,

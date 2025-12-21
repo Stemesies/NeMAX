@@ -7,6 +7,9 @@ public class ServerCommands {
 
     public static final CommandProcessor processor = new CommandProcessor();
 
+    /**
+     * Сообщение о том, что нужно войти в систему.
+     */
     private static void registerMsg() {
         System.out.println("you are logged out! Please, log in or register your account.");
     }
@@ -15,10 +18,17 @@ public class ServerCommands {
         System.out.println("Your friend request is approved!");
     }
 
+    /**
+     * Уведомление о новом сообщении группы или чата,
+     * который не открыт на данный момент.
+     */
     private static void newMessageMsg() {
         System.out.println("You have new massage!");
     }
 
+    /**
+     * Команды по запросу в друзья, отклонению заявки и пр.
+     */
     private static void initFriendResponse() {
         processor.register("friends", (a) -> a
                 .description("Friend request")
@@ -42,6 +52,9 @@ public class ServerCommands {
 
     }
 
+    /**
+     * Команды регистрации пользователя.
+     */
     private static void initRegisterResponse() {
         processor.register("register", (a) -> a
                 .description("Register message")
@@ -50,6 +63,10 @@ public class ServerCommands {
         );
     }
 
+    /**
+     * Команды по отправке уведомлений о непрочитанных сообщениях
+     * и передаче данных об открытом чате на сервер.
+     */
     private static void initGroupResponse() {
         processor.register("chat", (a) -> a
                 .description("Send id of open chat.")
@@ -84,6 +101,9 @@ public class ServerCommands {
         );
     }
 
+    /**
+     * Регистрация команд сервера на клиенте.
+     */
     public static void initGeneral() {
         initFriendResponse();
         initRegisterResponse();
