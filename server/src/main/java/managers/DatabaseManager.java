@@ -67,8 +67,8 @@ public class DatabaseManager {
             CREATE TABLE IF NOT EXISTS groups
              (
                  id    SERIAL PRIMARY KEY ,
-                 groupname  VARCHAR(200) NOT NULL ,
-                 name VARCHAR(200) ,
+                 groupname  VARCHAR(32) NOT NULL ,
+                 name VARCHAR(32) ,
                  type SMALLINT CHECK (type >= 0 AND type <= 3) NOT NULL ,
                  members INTEGER[] NOT NULL ,
                  admins INTEGER[] NOT NULL ,
