@@ -13,8 +13,8 @@ public class ClientApplication extends Application {
         var classLoader = Thread.currentThread().getContextClassLoader();
         FXMLLoader fxmlLoader = new
                 FXMLLoader(classLoader.getResource("git/fsbteam/gui/client-template.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 320, 240);
-        stage.setTitle("Hello!");
+        Scene scene = new Scene(fxmlLoader.load(), 1000, 700);
+        stage.setTitle("NeMax");
         stage.setScene(scene);
         stage.show();
     }

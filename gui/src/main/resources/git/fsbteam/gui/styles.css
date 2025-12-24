@@ -1,0 +1,13 @@
+.button {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 10px 20px;
+    -fx-border-radius: 5px;
+    -fx-cursor: pointer;
+}
+
+#welcomeText {
+    -fx-text-fill: navy;
+    -fx-font-size: 36px;
+}
