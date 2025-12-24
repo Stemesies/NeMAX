@@ -10,6 +10,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
 import java.net.URL;
@@ -21,20 +22,26 @@ public class ClientController implements Initializable {
     InputManager input = new InputManager();
 
     @FXML
+    private Label titleText;
+
+    @FXML
     private Label welcomeText;
 
     @FXML
     private TextField tf;
 
     @FXML
-    private TextField receivedMsg;
+    private TextArea receivedMsg;
 
     @FXML
     private Button serverButton;
 
     public void setInput() {
         System.out.println("input: " + tf.getText());
-        this.input.setInput(tf.getText());
+        if (tf != null)
+            this.input.setInput(tf.getText());
+        else
+            this.input.setInput(null);
     }
 
     @FXML
@@ -75,6 +82,7 @@ public class ClientController implements Initializable {
         // Если через это поле можно менять значение MSG
 //        tf.textProperty().bindBidirectional(MSGProperty());
         ServerConnectManager.addOutPutListener(ClientController::setMsg);
+//        titleText.setText("NeMax");
     }
 
     @FXML

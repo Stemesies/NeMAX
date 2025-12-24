@@ -57,6 +57,9 @@ public class InputManager {
             var msg = this.input;
             i++;
 
+            if (this.input.isEmpty())
+                continue;
+
             if (msg.charAt(0) == '/') {
                 commandProcessor.execute(msg, null);
                 var procError = commandProcessor.getLastError();

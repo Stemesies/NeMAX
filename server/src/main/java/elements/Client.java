@@ -74,6 +74,19 @@ public class Client {
         return user == null ? super.toString() : user.getName();
     }
 
+    /**
+     * Выводит сообщение от себя в чат пользователя.
+     *
+     * @param message - сообщение в чат
+     */
+    public String getOffset(String message) {
+        String offset = " ";
+        for (int i = 0; i < (220 - message.length() * 1.5); i++) {
+            offset += " ";
+        }
+        return offset + message;
+    }
+
     public void sendMessageToChat(String message) {
         if (user != null) {
             if (group == null) {
@@ -88,7 +101,13 @@ public class Client {
                 var client = CollectionExt.findBy(ServerData.getClients(), (it) -> it.user == u);
                 if (client == null)
                     continue;
-                client.sendln(chatMessage);
+                if (client != this) {
+                    client.sendln(chatMessage);
+                } else {
+//                    client.sendln("                                                      "
+//                            + chatMessage);
+                    client.sendln(getOffset(chatMessage));
+                }
             }
         } else {
             sendln(Ansi.Colors.RED.apply("You aren't logged in."));
