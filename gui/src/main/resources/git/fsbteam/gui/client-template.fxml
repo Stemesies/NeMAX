@@ -6,9 +6,8 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<VBox alignment="CENTER" prefHeight="491.0" prefWidth="614.0" spacing="20.0" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/17.0.12"
-      xmlns:fx="http://javafx.com/fxml/1" fx:controller="git.fsbteam.gui.ClientController">
-    <Label fx:id="titleText" prefHeight="22.0" prefWidth="177.0" text="NeMax" textAlignment="CENTER" wrapText="true" />
+<VBox alignment="CENTER" prefHeight="732.0" prefWidth="586.0" spacing="20.0" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="git.fsbteam.gui.ClientController">
+    <Label fx:id="titleText" alignment="TOP_CENTER" contentDisplay="CENTER" prefHeight="63.0" prefWidth="406.0" text="NeMax" wrapText="true" />
     <Label fx:id="online" prefHeight="31.0" prefWidth="74.0" textAlignment="RIGHT" />
 
   <Label fx:id="welcomeText" />
