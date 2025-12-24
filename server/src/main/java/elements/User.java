@@ -10,6 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import managers.DatabaseManager;
 
@@ -49,7 +50,7 @@ public class User extends AbstractUser {
         return null;
     }
 
-    public static int getUserIdByUsername(String username) {
+    public static Integer getUserIdByUsername(String username) {
         String sql = "SELECT id FROM users WHERE username = ?";
 
         try (Connection conn = DatabaseManager.getConnection();
@@ -65,7 +66,7 @@ public class User extends AbstractUser {
             System.err.println("Error: " + e.getMessage());
         }
 
-        return 0;
+        return null;
     }
 
     public static boolean userExists(String username) {
@@ -257,9 +258,60 @@ public class User extends AbstractUser {
 //            }
 //        }
 //    }
+    public void addFriend(StringPrintWriter out, String username) {
+        Integer friendId = getUserIdByUsername(username);
+        if (friendId == null) {
+            out.println(Ansi.Colors.RED.apply("User not found."));
+            return;
+        }
+
+        String sql = "INSERT INTO user_friends (user_id, friend_id) VALUES (?, ?)";
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            int user1 = Math.min(this.id, friendId);
+            int user2 = Math.max(this.id, friendId);
+            stmt.setInt(1, user1);
+            stmt.setInt(2, user2);
+            stmt.executeUpdate();
+
+            out.println("You are now friends with " + username);
+
+        } catch (SQLException e) {
+            System.err.println("Error adding User`s friend: " + e.getMessage());
+        }
+    }
 
     public void sendFriendRequest(StringPrintWriter out, String username) {
         out.println("Sent request to " + username);
+        addFriend(out, username);
+    }
+
+    public List<Integer> getFriendsId() {
+        List<Integer> friends = new ArrayList<>();
+        String sql = """
+               SELECT u.id FROM users u
+               JOIN user_friends uf ON (u.id = uf.friend_id AND uf.user_id = ?)
+                                           OR (u.id = uf.user_id AND uf.friend_id = ?)
+               WHERE u.id != ?""";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, this.id);
+            stmt.setInt(2, this.id);
+            stmt.setInt(3, this.id);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                friends.add(rs.getInt("id"));
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error getting Friends: " + e.getMessage());
+        }
+
+        return friends;
     }
 
     // Возможно переименование в setPassword

@@ -149,7 +149,7 @@ public class ClientCommands {
             .require(requireAuth)
             .subcommand("list", (b) -> b
                 .executes((ctx) -> {
-                    var list = ctx.data.user.getFriends();
+                    var list = ctx.data.user.getFriendsId();
                     if (list.isEmpty())
                         ctx.out.println("No friends.");
                     else

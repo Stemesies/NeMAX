@@ -58,10 +58,19 @@ public class DatabaseManager {
                  name VARCHAR(32) ,
                  password VARCHAR(256) NOT NULL ,
                  salt VARCHAR(200) NOT NULL ,
-                 friends INTEGER[] ,
-                 last_online TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+                 last_online TIMESTAMP DEFAULT CURRENT_TIMESTAMP
              );
                \s""",
+                // Таблица друзей пользователей
+            """
+            CREATE TABLE IF NOT EXISTS user_friends (
+                user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE ,
+                friend_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE ,
+                friendship_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ,
+                PRIMARY KEY (user_id, friend_id) ,
+                CHECK (user_id < friend_id)
+            );
+              \s""",
                 // Таблица групп
             """
             CREATE TABLE IF NOT EXISTS groups
