@@ -75,23 +75,25 @@ public class Client {
     }
 
     public void sendMessageToChat(String message) {
-        if (user != null) {
-            if (group == null) {
-                sendln(Ansi.Colors.RED.apply("No group opened."));
-                return;
-            }
-            var chatMessage = Utils.createChatMessage(this, message);
-
-            System.out.println(group.groupname + ": " + chatMessage);
-            group.messages.add(new Message(0, chatMessage, 0, null));
-            for (var u : group.members) {
-                var client = CollectionExt.findBy(ServerData.getClients(), (it) -> it.user.id == u);
-                if (client == null)
-                    continue;
-                client.sendln(chatMessage);
-            }
-        } else {
+        if (user == null) {
             sendln(Ansi.Colors.RED.apply("You aren't logged in."));
+            return;
+        }
+        if (group == null) {
+            sendln(Ansi.Colors.RED.apply("No group opened."));
+            return;
+        }
+        var chatMessage = Utils.createChatMessage(this, message);
+
+        System.out.println(group.groupname + ": " + chatMessage);
+        Message messageContent = new Message(0, chatMessage, user.getUserId(), null);
+        group.messages.add(messageContent);
+        group.addMessage(messageContent);
+        for (var u : group.members) {
+            var client = CollectionExt.findBy(ServerData.getClients(), (it) -> it.user.id == u);
+            if (client == null)
+                continue;
+            client.sendln(chatMessage);
         }
     }
 }

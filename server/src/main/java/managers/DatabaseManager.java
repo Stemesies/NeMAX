@@ -78,12 +78,13 @@ public class DatabaseManager {
                \s""",
                 // Таблица сообщений
             """
-            CREATE TABLE IF NOT EXISTS message
+            CREATE TABLE IF NOT EXISTS messages
             (
                 id SERIAL PRIMARY KEY ,
+                group_id INTEGER NOT NULL REFERENCES groups(id) ON DELETE CASCADE ,
                 content TEXT ,
-                sender INTEGER NOT NULL ,
-                time TIMESTAMP NOT NULL
+                sender_id INTEGER NOT NULL ,
+                sent_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
             );
                \s""",
         };

@@ -11,6 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class Group extends AbstractGroup {
 
@@ -155,5 +156,44 @@ public class Group extends AbstractGroup {
         }
         addMember(username);
         out.println(username + " invited to " + name);
+    }
+
+    public void addMessage(Message message) {
+        String sql = "INSERT INTO messages (group_id, content, sender_id)\n"
+                + "VALUES (?, ?, ?);";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, this.id);
+            stmt.setString(2, message.getContent());
+            stmt.setInt(3, message.getSenderId());
+
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            System.err.println("Error adding Group: " + e.getMessage());
+        }
+    }
+
+    public List<String> getMessagesContent() {
+        List<String> messages = new ArrayList<>();
+        String sql = "SELECT * FROM messages WHERE group_id = ?";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, this.id);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                messages.add(rs.getString("content"));
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error adding Group: " + e.getMessage());
+        }
+
+        return messages;
     }
 }

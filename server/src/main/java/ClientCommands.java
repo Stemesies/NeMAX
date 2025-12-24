@@ -138,10 +138,8 @@ public class ClientCommands {
                     return;
                 }
                 ctx.data.client.group = group;
-                for (var m : group.getMessages())
-                    ctx.data.client.sendln(m.getContent());
-
-
+                for (var m : group.getMessagesContent())
+                    ctx.data.client.sendln(m);
             })
         );
     }
