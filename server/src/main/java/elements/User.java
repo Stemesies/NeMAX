@@ -24,6 +24,50 @@ public class User extends AbstractUser {
         this.id = username.hashCode();
     }
 
+    public static User getUserById(int id) {
+        String sql = "SELECT * FROM users WHERE id = ?)";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                String username = rs.getString(2);
+                String password = rs.getString(4);
+                User user = new User(username, password);
+                user.name = rs.getString(3);
+                user.id = rs.getInt(1);
+
+                return user;
+            }
+        } catch (SQLException e) {
+            System.err.println("Error: " + e.getMessage());
+        }
+
+        return null;
+    }
+
+    public static int getUserIdByUsername(String username) {
+        String sql = "SELECT id FROM users WHERE username = ?";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error: " + e.getMessage());
+        }
+
+        return 0;
+    }
+
     public static boolean userExists(String username) {
         String sql = "SELECT EXISTS(SELECT 1 FROM users WHERE username = ?)";
 
@@ -68,7 +112,7 @@ public class User extends AbstractUser {
             stmt.setString(3, password);
             stmt.setString(4, salt);
 
-            stmt.executeQuery();
+            stmt.executeUpdate();
 
         } catch (SQLException e) {
             System.err.println("Error adding User: " + e.getMessage());
