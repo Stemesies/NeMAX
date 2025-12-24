@@ -70,8 +70,7 @@ public class DatabaseManager {
                  groupname  VARCHAR(32) NOT NULL ,
                  name VARCHAR(32) ,
                  type SMALLINT CHECK (type >= 0 AND type <= 3) NOT NULL ,
-                 owner_id INTEGER NOT NULL REFERENCES users(id) ,
-                 messages INTEGER[]
+                 owner_id INTEGER NOT NULL REFERENCES users(id)
              );
                \s""",
                 // Таблица участников групп
