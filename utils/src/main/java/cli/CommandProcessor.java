@@ -56,4 +56,8 @@ public class CommandProcessor extends CustomCommandProcessor<Object> {
     public CommandError execute(String input) {
         return super.execute(input, new Object());
     }
+
+    public boolean executeAndExplain(String input) {
+        return super.executeAndExplain(input, new Object());
+    }
 }

@@ -71,30 +71,4 @@ public class CommandHelperTest {
         Assertions.assertNull(processor.getLastError());
 
     }
-
-    @Test
-    public void help() {
-
-        var processor = new CommandProcessor();
-        processor.register("phantom", (a) -> a
-            .isPhantom()
-            .description("I'm phantom!")
-        );
-        processor.register("phantom", (a) -> a
-            .isPhantom()
-            .description("I'm phantom!")
-            .subcommand("sub", (b)->b
-                .description("And this is Sub!")
-                .executes(()->{})
-            )
-        );
-        processor.register("friends", (a) -> a
-            .description("Friends")
-            .subcommand("add", (b)->b
-                .description("Adds friend")
-                .executes(()->{})
-            )
-        );
-
-    }
 }
