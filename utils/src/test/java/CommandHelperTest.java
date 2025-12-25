@@ -1,6 +1,6 @@
-import cli.Command;
-import cli.CommandErrors;
-import cli.CommandProcessor;
+import utils.cli.Command;
+import utils.cli.CommandErrors;
+import utils.cli.CommandProcessor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

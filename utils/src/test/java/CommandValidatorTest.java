@@ -1,13 +1,13 @@
-import cli.CommandErrors;
-import cli.CommandValidator;
+import utils.cli.CommandErrors;
+import utils.cli.CommandValidator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import utils.Ansi;
 
-import static cli.CommandErrors.INVALID_SEPARATOR;
-import static cli.CommandErrors.NO_SEPARATION;
-import static cli.CommandErrors.UNCLOSED_QUOTE;
-import static cli.CommandErrors.UNEXPECTED_SYMBOL;
+import static utils.cli.CommandErrors.INVALID_SEPARATOR;
+import static utils.cli.CommandErrors.NO_SEPARATION;
+import static utils.cli.CommandErrors.UNCLOSED_QUOTE;
+import static utils.cli.CommandErrors.UNEXPECTED_SYMBOL;
 
 public class CommandValidatorTest {
 
