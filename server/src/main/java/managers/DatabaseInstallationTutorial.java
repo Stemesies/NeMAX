@@ -73,6 +73,9 @@ public class DatabaseInstallationTutorial {
         System.out.println("[13] В окне во вкладке General напишите в поле \"Database\" \"" + USERNAME + "\"");
         System.out.println("     В качестве владельца выберите \"" +  USERNAME + "\"");
         System.out.println("     Сохраните изменения.");
+        await();
+        System.out.println("[14] Попробуйте заново запустить ServerMain.");
+        System.out.println("     Желаю удачи. ovo");
     }
 
 }
