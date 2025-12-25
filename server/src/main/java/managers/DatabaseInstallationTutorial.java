@@ -52,7 +52,8 @@ public class DatabaseInstallationTutorial {
         await();
         System.out.println("[8] В открывшемся окне находим боковое меню \"Object Explorer\"");
         System.out.println("    Снизу также должна быть надпись \"Servers (1)\"");
-        System.out.println("    Если ничего нет, убедитесь, что слева выбрана вкладка \"Default Workspace\"");
+        System.out.println("    Если ничего нет, убедитесь, что слева выбрана вкладка"
+                + " \"Default Workspace\"");
         System.out.println("    (Кнопка под надписью \"File\")");
         await();
         System.out.println("[9] Открываем \"Servers\" и выбираем там \"PostgreSQL 18 (64bit)\"");
@@ -63,14 +64,16 @@ public class DatabaseInstallationTutorial {
         System.out.println("     Нажмите ПКМ, Create, Login/Group Role");
         await();
         System.out.println("[11] В окне, во вкладке General напишите имя \"" + USERNAME + "\"");
-        System.out.println("     Во вкладке Definition в поле \"Password\" напишите \"" + PASSWORD + "\"");
+        System.out.println("     Во вкладке Definition в поле \"Password\" напишите"
+                + " \"" + PASSWORD + "\"");
         System.out.println("     Во вкладке Privileges включите \"Can login?\"");
         System.out.println("     Сохраните изменения.");
         await();
         System.out.println("[12] В дереве сервера найдите запись \"Databases (1)\"");
         System.out.println("     Нажмите ПКМ, Create, Database");
         await();
-        System.out.println("[13] В окне во вкладке General напишите в поле \"Database\" \"" + USERNAME + "\"");
+        System.out.println("[13] В окне во вкладке General напишите в поле"
+                + " \"Database\" \"" + USERNAME + "\"");
         System.out.println("     В качестве владельца выберите \"" +  USERNAME + "\"");
         System.out.println("     Сохраните изменения.");
         await();
