@@ -4,7 +4,6 @@ import client.elements.cli.ServerCommands;
 import client.elements.Client;
 import utils.StringPrintWriter;
 import utils.elements.ClientTypes;
-import client.elements.InputManager;
 import client.elements.ServerConnectManager;
 
 import javafx.beans.property.SimpleStringProperty;
@@ -80,8 +79,6 @@ public class ClientController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         ServerCommands.initGeneral();
-//        System.out.println("text: " + tf.getText());
-//        System.out.println("label: " + welcomeText.getText());
 
         // Если поле только для отображения (не может изменять значение MSG)
         receivedMsg.textProperty().bind(msgProperty());
@@ -114,7 +111,7 @@ public class ClientController implements Initializable {
     private Button helpBtn;
 
     @FXML
-    private Label online;
+    private Button logInBtn;
 
     @FXML
     public void setRegister() {
@@ -142,12 +139,7 @@ public class ClientController implements Initializable {
     }
 
     @FXML
-    public void setOnline() {
-        online.setText("• online");
-    }
-
-    @FXML
-    public void setOffline() {
-        online.setText(null);
+    public void onLogIn() {
+        setInput("/login " + tf.getText());
     }
 }

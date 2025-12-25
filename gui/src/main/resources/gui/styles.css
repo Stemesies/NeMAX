@@ -22,7 +22,13 @@
 }
 
 #receivedMsg {
-    -fx-background-color: rgb(17, 147, 187);
+    /* -fx-background-color: rgb(17, 147, 187); */
+    -fx-control-inner-background: rgb(17, 147, 187);
+}
+
+.text-area {
+    /* -fx-background-color: rgb(17, 147, 187); */
+    -fx-control-inner-background: rgb(17, 147, 187);
 }
 
 .title {
@@ -42,4 +48,12 @@
 
 .Pane {
     -fx-position: center;
+}
+
+#helpBtn {
+    -fx-background-color: #007500;
+     -fx-text-fill: white;
+     -fx-font-size: 14px;
+     -fx-padding: 10px 10px;
+     -fx-border-radius: 50%;
 }
