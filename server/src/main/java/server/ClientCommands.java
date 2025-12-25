@@ -42,7 +42,8 @@ public class ClientCommands {
     }
 
     private static void accountCategoryInit() {
-        processor.register("request", (client) -> client
+        processor.register("require", (client) -> client
+                .isInvisible()
                 .subcommand("type", (type) -> type
                         .executes((smth) -> {
                             return;

@@ -1,7 +1,6 @@
 plugins {
     id 'java'
     id 'checkstyle'
-//    id 'org.javamodularity.moduleplugin' version '1.1.1'
 }
 
 group = 'git.fsb-team'
@@ -15,7 +14,6 @@ dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     implementation project(':utils')
-//    implementation project(':gui')
 }
 
 test {

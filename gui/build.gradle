@@ -10,7 +10,7 @@ repositories {
     mavenCentral()
 }
 
-
+tasks.register("prepareKotlinBuildScriptModel")
 
 dependencies {
     implementation 'org.kordamp.ikonli:ikonli-javafx:12.3.1'

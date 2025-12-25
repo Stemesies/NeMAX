@@ -40,7 +40,7 @@ public class ClientController implements Initializable {
 
         if (tf != null) {
             System.out.println("input: " + input);
-            Client.inputManager.processInput(input);
+            Client.input.processInput(input);
             tf.setText(null);
         }
 

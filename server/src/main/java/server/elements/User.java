@@ -1,6 +1,8 @@
 package server.elements;
 
+import server.managers.FriendManager;
 import server.managers.JoinManager;
+import server.managers.Manager;
 import server.managers.RegisterManager;
 import utils.Ansi;
 import utils.StringPrintWriter;
@@ -76,37 +78,37 @@ public class User extends AbstractUser {
 
     }
 
-//    @Deprecated
-//    public void activateManager() {
-//        while (!this.requests.isEmpty()) {
-//            SuperRequest r = requests.getFirst();
-////            Manager manager = new Manager();
-//            switch (r.type) {
-//                case Register:
-//                    RegisterManager manager1 = new RegisterManager();
-//                    /*что-нибудь про регистрацию*/
-//                    break;
-//                case Join:
-//                    // Достаём пользователя и группу из базы данных по id,
-//                    // инициализируем поля класса.
-//                    // Пока вставим заглушки
-//                    User user = new User("", "");
-//                    Group group = new Group();
-//                    JoinManager manager2 = new JoinManager(user, group);
-//                    manager2.applyManager();
-//                    break;
-//                case Friend:
-//                    // достаём пользователей из базы данных по id, инициилизируем поля класса
-//                    // response = true, пока мы не продумали ответ второго пользователя
-//                    User user1 = new User("", "");
-//                    User user2 = new User("", "");
-//                    FriendManager manager3 = new FriendManager(user1, user2, true);
-//                    manager3.applyManager();
-//                    break;
-//                default: return;
-//            }
-//        }
-//    }
+    @Deprecated
+    public void activateManager() {
+        while (!this.requests.isEmpty()) {
+            SuperRequest r = requests.getFirst();
+            Manager manager;
+            switch (r.type) {
+                case Register:
+                    manager = new RegisterManager();
+                    /*что-нибудь про регистрацию*/
+                    break;
+                case Join:
+                    // Достаём пользователя и группу из базы данных по id,
+                    // инициализируем поля класса.
+                    // Пока вставим заглушки
+                    User user = new User("", "");
+                    Group group = new Group(user, "", "");
+                    manager = new JoinManager(user, group);
+                    manager.applyManager();
+                    break;
+                case Friend:
+                    // достаём пользователей из базы данных по id, инициилизируем поля класса
+                    // response = true, пока мы не продумали ответ второго пользователя
+                    User user1 = new User("", "");
+                    User user2 = new User("", "");
+                    manager = new FriendManager(user1, user2, true);
+                    manager.applyManager();
+                    break;
+                default: return;
+            }
+        }
+    }
 
     public void sendFriendRequest(StringPrintWriter out, String username) {
         out.println("Sent request to " + username);

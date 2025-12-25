@@ -17,7 +17,7 @@ public class Client {
 
     static ServerConnectManager scm = new ServerConnectManager("127.0.0.1", 8080);
 
-    public static InputManager inputManager = new InputManager();
+    public static InputManager input = new InputManager();
 
     public static HashMap<String, ArrayList<String>> map = new HashMap<>(20);
 
@@ -37,7 +37,6 @@ public class Client {
     public static void addUnreadMsg(String groupName, Object msg) {
         ArrayList<String> unread = map.get(groupName);
         unread.add(msg.toString());
-        map.put(groupName, unread);
     }
 
     /**
