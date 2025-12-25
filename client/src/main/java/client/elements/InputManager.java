@@ -5,6 +5,7 @@ import utils.cli.CommandProcessor;
 
 import java.util.Scanner;
 
+import static client.elements.ServerConnectManager.exit;
 import static utils.cli.CommandErrors.PHANTOM_COMMAND;
 
 public class InputManager {
@@ -16,28 +17,8 @@ public class InputManager {
         ServersideCommands.init(commandProcessor);
     }
 
-    protected String message;
-
     boolean isConnected() {
         return ServerConnectManager.socket != null;
-    }
-
-    public void exit() {
-        disconnect();
-        System.exit(0);
-    }
-
-    /**
-     * Разрывает соединение с сервером, если таковое имеется. <br>
-     * Все потоки, работающие с ним также будут автоматически остановлены.
-     */
-    public void disconnect() {
-        if (ServerConnectManager.socket == null)
-            return;
-
-        ServerConnectManager.socket.close();
-        ServerConnectManager.socket = null;
-        System.out.println("Disconnected from the server");
     }
 
     public void startInputThread() {

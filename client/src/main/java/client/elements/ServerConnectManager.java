@@ -54,7 +54,7 @@ public class ServerConnectManager {
      * Разрывает соединение с сервером, если таковое имеется. <br>
      * Все потоки, работающие с ним также будут автоматически остановлены.
      */
-    public void disconnect() {
+    public static void disconnect() {
         if (socket == null)
             return;
 
@@ -86,7 +86,7 @@ public class ServerConnectManager {
         }).start();
     }
 
-    public void exit() {
+    public static void exit() {
         disconnect();
         System.exit(0);
     }
@@ -97,7 +97,7 @@ public class ServerConnectManager {
     private void registerClientsideCommands() {
 
         commandProcessor.register("exit", (it) -> it
-                .executes(this::exit)
+                .executes(ServerConnectManager::exit)
         );
         commandProcessor.register("retry", (it) -> it
                 .require("Already connected.", this::isDisconnected)
