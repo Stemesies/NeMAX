@@ -1,5 +1,6 @@
 package gui;
 
+import client.elements.OutputManager;
 import client.elements.cli.ServerCommands;
 import client.elements.Client;
 import javafx.concurrent.Worker;
@@ -101,7 +102,7 @@ public class ClientController implements Initializable {
 //        receivedMsg.textProperty().bind(msgProperty());
         // Если через это поле можно менять значение MSG
 //        tf.textProperty().bindBidirectional(MSGProperty());
-        ServerConnectManager.addOutPutListener(ClientController::setMsg);
+        OutputManager.addOutPutListener(ClientController::setMsg);
     }
 
     @FXML

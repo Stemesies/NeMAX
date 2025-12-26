@@ -1,18 +1,9 @@
 package client.elements;
 
 import utils.cli.CommandProcessor;
-import utils.kt.Apply;
 import utils.network.SimpleSocket;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class ServerConnectManager {
-    private static final List<Apply<String>> outputListeners = new ArrayList<>();
-
-    public static void addOutPutListener(Apply<String> listener) {
-        outputListeners.add(listener);
-    }
 
     public final String host;
     public final int port;
@@ -44,8 +35,9 @@ public class ServerConnectManager {
             this.message = "Connected";
             processConnection();
             System.out.println("Здесь лежит не нулл! " + this.message);
-            outputListeners.forEach(it -> it.run(this.message));
-//            updateControllerMsg();
+            OutputManager.print(this.message);
+            OutputManager.stylePrint(message);
+//            OutputManager.getOutputListeners().forEach(it -> it.run(this.message));
 //            System.out.println("Он должен быть в строке: " + HelloController.getMsg());
         }
     }
@@ -61,6 +53,7 @@ public class ServerConnectManager {
         socket.close();
         socket = null;
         System.out.println("Disconnected from the server");
+        OutputManager.print("Disconnected from the server");
     }
 
     boolean isDisconnected() {
@@ -76,7 +69,8 @@ public class ServerConnectManager {
                 if (socket.hasNewMessage()) {
                     this.message = socket.receiveMessage();
                     System.out.println(this.message);
-                    outputListeners.forEach(it -> it.run(this.message));
+                    OutputManager.print(this.message);
+                    OutputManager.stylePrint(this.message);
 //                    updateControllerMsg();
                 } else {
                     disconnect();

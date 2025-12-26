@@ -15,6 +15,10 @@ public class Client {
         Client.type = type;
     }
 
+    public static ClientTypes getType() {
+        return type;
+    }
+
     static ServerConnectManager scm = new ServerConnectManager("127.0.0.1", 8080);
 
     public static InputManager input = new InputManager();
