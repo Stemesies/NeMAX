@@ -10,11 +10,6 @@ public class User extends AbstractUser {
     }
 
     @Override
-    public void setName(String name) {
-
-    }
-
-    @Override
     public void setPassword(String password) {
 
     }
