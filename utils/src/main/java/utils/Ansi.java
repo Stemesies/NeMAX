@@ -93,6 +93,23 @@ public class Ansi {
     }
 
     /**
+     * Форматирует вывод для UI.
+     */
+    public static String applyHtml(Object msg, Ansi style) {
+        return style.openSpan + msg + style.closeSpan;
+    }
+
+    /**
+     * Выбираем, что применить.
+     */
+    public static String applyChoose(Object msg, Ansi style, boolean isHtml) {
+        if (isHtml) {
+            return applyHtml(msg, style);
+        }
+        return applyStyle(msg, style);
+    }
+
+    /**
      * Убирает последний написанный в консоли символ.
      * <br>
      * <br>Встроенная консоль Intellij IDEA не поддерживает эту функцию.
@@ -128,7 +145,7 @@ public class Ansi {
 
         public static final Ansi BLACK = new Ansi("30", "<span style=\"color: #000000\">", "</span>");
         public static final Ansi RED = new Ansi("31", "<span style=\"color: #dd1212\">", "</span>");
-        public static final Ansi GREEN = new Ansi("32", "<span style=\"color: #007500\">", "</span>");
+        public static final Ansi GREEN = new Ansi("32", "<span style=\"color: green\">", "</span>");
         public static final Ansi YELLOW = new Ansi("33", "<span style=\"color: #f1ee35\">", "</span>");
         public static final Ansi BLUE = new Ansi("34", "<span style=\"color: #265dc2\">", "</span>");
         public static final Ansi MAGENTA = new Ansi("35", "<span style=\"color: #c226b8\">", "</span>");

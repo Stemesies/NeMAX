@@ -1,8 +1,8 @@
 package client.elements;
 
 import client.elements.cli.ServersideCommands;
-import utils.Ansi;
 import utils.cli.CommandProcessor;
+import utils.elements.ClientTypes;
 
 import java.util.Scanner;
 
@@ -47,14 +47,15 @@ public class InputManager {
             if (procError != null) {
                 if (procError.type == PHANTOM_COMMAND)
                     ServerConnectManager.send(msg);
-                else
-                    procError.explain();
+                else {
+                    boolean isHtml = Client.getType() != ClientTypes.CONSOLE;
+                    OutputManager.print(procError.getMessage(isHtml));
+                }
             } else if (!procOutput.isEmpty())
-                System.out.print(procOutput);
+                OutputManager.print(procOutput);
 
             return;
         }
-
         ServerConnectManager.send(msg);
 
     }

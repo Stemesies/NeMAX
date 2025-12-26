@@ -1,7 +1,7 @@
 package client.elements;
 
 import client.elements.cli.ServerRequestCommands;
-import utils.cli.CommandProcessor;
+import utils.Ansi;
 
 import utils.kt.Apply;
 import utils.network.SimpleSocket;
@@ -24,8 +24,10 @@ public class ServerConnectManager {
     public static void send(String msg) {
         if (isConnected())
             socket.sendln(msg);
-        else
+        else {
             System.err.println("Not connected to server.");
+            OutputManager.stylePrint("Not connected to server.", Ansi.Colors.RED);
+        }
     }
 
     static boolean isConnected() {
@@ -37,15 +39,18 @@ public class ServerConnectManager {
      */
     public static void connect() {
         socket = new SimpleSocket(host, port);
-        if (socket.isClosed())
+
+        if (socket.isClosed()) {
             socket = null;
-        else {
+            OutputManager.stylePrint("Can't connect to server.", Ansi.Colors.RED);
+        } else {
             System.out.println("Connected to the server");
             processConnection();
             outputListeners.forEach(it -> it.run("Connected to the server"));
 //            updateControllerMsg();
+            OutputManager.stylePrint("Connected", Ansi.Colors.GREEN);
+//            OutputManager.getOutputListeners().forEach(it -> it.run(this.message));
 //            System.out.println("Он должен быть в строке: " + HelloController.getMsg());
-
         }
     }
 
@@ -59,7 +64,7 @@ public class ServerConnectManager {
 
         socket.close();
         socket = null;
-        System.out.println("Disconnected from the server");
+        OutputManager.stylePrint("Disconnected from the server", Ansi.Colors.RED);
     }
 
     static boolean isDisconnected() {
@@ -75,13 +80,16 @@ public class ServerConnectManager {
                 if (socket.hasNewMessage()) {
                     var message = socket.receiveMessage();
 
+                    if (message.isEmpty())
+                        continue;
+
                     // Сервер прислал запрос. Отвечаем и ничего не выводим пользователю.
                     if (ServerRequestCommands.processor.execute(message) == null)
                         continue;
 
                     System.out.println(message);
                     outputListeners.forEach(it -> it.run(message));
-//                    updateControllerMsg();
+                    OutputManager.print(message);
                 } else {
                     disconnect();
                     break;

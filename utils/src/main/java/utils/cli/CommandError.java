@@ -5,18 +5,29 @@ import utils.Ansi;
 
 public class CommandError {
 
-    public final String message;
+    public final String rawMessage;
+    public final String command;
     public final CommandErrors type;
     public final int start;
     public final int end;
+    public final boolean isSimple;
+
+    public String getMessage(boolean isHtml) {
+        if (this.isSimple) {
+            return Ansi.applyChoose(rawMessage, Ansi.Colors.RED, isHtml)
+                    + (command == null ? "" : "\n" + command);
+        }
+        return highlightError(rawMessage, command, start, end, isHtml);
+    }
 
     CommandError(CommandErrors type, String command, int start, int end, Object... args) {
         this.type = type;
         this.start = start;
         this.end = end;
+        this.command = command;
+        this.isSimple = false;
 
-        message = highlightError(type.getMessage().formatted(args), command, start, end);
-
+        this.rawMessage = type.getMessage().formatted(args);
     }
 
     /**
@@ -30,9 +41,10 @@ public class CommandError {
         this.type = type;
         this.start = 0;
         this.end = 0;
+        this.command = command;
+        this.isSimple = true;
 
-        message = Ansi.applyStyle(type.getMessage().formatted(args), Ansi.Colors.RED)
-            + (command == null ? "" : "\n" + command);
+        this.rawMessage = type.getMessage().formatted(args);
     }
 
     CommandError(CommandErrors type, String command, Token token, Object... args) {
@@ -48,7 +60,8 @@ public class CommandError {
         this(type, context.command, context.currentToken(), args);
     }
 
-    private static String highlightError(String msg, String command, int start, int end) {
+    private static String highlightError(String msg, String command,
+                                         int start, int end, boolean html) {
         var cl = command.length();
 
         var leftPos = Math.min(start, cl);
@@ -59,32 +72,34 @@ public class CommandError {
             ? " ".repeat(end - start)
             : "";
 
-        var errorSentence = Ansi.applyStyle(
+        var errorSentence = Ansi.applyChoose(
             command.substring(leftPos, rightPos) + extension,
-            Ansi.Colors.RED.and(Ansi.Modes.UNDERLINE)
+            Ansi.Colors.RED.and(Ansi.Modes.UNDERLINE),
+                html
         );
 
-        var rightSentence = Ansi.applyStyle(
+        var rightSentence = Ansi.applyChoose(
             goesOutBounds ? "" : command.substring(end),
-            Ansi.Colors.RED
+            Ansi.Colors.RED,
+                html
         );
 
-        return Ansi.applyStyle(msg, Ansi.Colors.RED)
+        return Ansi.applyChoose(msg, Ansi.Colors.RED, html)
             + '\n'
             + command.substring(0, leftPos)
             + errorSentence
             + rightSentence
             + '\n'
             + " ".repeat(leftPos)
-            + Ansi.applyStyle("^".repeat(end - start), Ansi.Colors.RED);
+            + Ansi.applyChoose("^".repeat(end - start), Ansi.Colors.RED, html);
     }
 
     @Override
     public String toString() {
-        return message;
+        return getMessage(false);
     }
 
     public void explain() {
-        System.out.println(message);
+        System.out.println(getMessage(false));
     }
 }

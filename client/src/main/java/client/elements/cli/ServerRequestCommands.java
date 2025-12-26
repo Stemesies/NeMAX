@@ -2,7 +2,6 @@ package client.elements.cli;
 
 import client.elements.Client;
 import client.elements.ServerConnectManager;
-import utils.Ansi;
 import utils.cli.CommandProcessor;
 
 public class ServerRequestCommands {

@@ -1,12 +1,11 @@
 package gui;
 
+import client.elements.OutputManager;
 import client.elements.cli.ServerCommands;
 import client.elements.Client;
 import javafx.concurrent.Worker;
 import javafx.scene.web.WebView;
 import utils.StringPrintWriter;
-import utils.elements.ClientTypes;
-import client.elements.ServerConnectManager;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -18,7 +17,6 @@ import javafx.scene.control.TextField;
 
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.concurrent.CompletableFuture;
 
 public class ClientController implements Initializable {
 
@@ -30,9 +28,6 @@ public class ClientController implements Initializable {
 
     @FXML
     private TextField tf;
-
-//    @FXML
-//    private TextArea receivedMsg;
 
     @FXML
     private WebView receivedMsg;
@@ -57,10 +52,7 @@ public class ClientController implements Initializable {
 
     @FXML
     public void showServerResult() {
-        CompletableFuture.supplyAsync(() -> {
-            Client.launch(ClientTypes.GUI);
-            return null;
-        });
+        setInput("/retry");
     }
 
     public static String getMsg() {
@@ -68,7 +60,7 @@ public class ClientController implements Initializable {
     }
 
     public static void setMsg(String msg) {
-        System.out.println("Output: " + msg);
+//        System.out.println("Output: " + msg);
         output.println(msg + "<br>");
         MSG.set(output.toString());
     }
@@ -89,19 +81,19 @@ public class ClientController implements Initializable {
         receivedMsg.getEngine().getLoadWorker().stateProperty().addListener((
                 obs, oldVal, newVal) -> {
             if (newVal == Worker.State.SUCCEEDED) {
-                receivedMsg.getEngine().loadContent(
-                        "<html><body style=\"background-color: rgb(17, 147, 187); "
-                                + "font-family: Segoe UI; text-fill: rgb(142, 237, 137)\">"
-                                + msgProperty().getValue() + "</body></html>");
+                receivedMsg.getEngine().loadContent("<html><body style="
+                        + "\"background-color: rgb(17, 147, 187); "
+                                + "font-style: italic; color: white; overflow-y: scroll;"
+                                + "overflow-x: scroll;\">"
+                                + "<pre>" + msgProperty().getValue() + "</pre>"
+                        + "</body></html>");
+                var height = (int) receivedMsg.getEngine()
+                        .executeScript("document.body.scrollHeight; document.body.scrollWidth");
+                receivedMsg.setPrefHeight(height);
             }
         });
-//        receivedMsg.accessibleTextProperty().bindBidirectional(msgProperty());
 
-        // Если поле только для отображения (не может изменять значение MSG)
-//        receivedMsg.textProperty().bind(msgProperty());
-        // Если через это поле можно менять значение MSG
-//        tf.textProperty().bindBidirectional(MSGProperty());
-        ServerConnectManager.addOutPutListener(ClientController::setMsg);
+        OutputManager.addOutPutListener(ClientController::setMsg);
     }
 
     @FXML

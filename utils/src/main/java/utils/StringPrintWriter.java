@@ -34,6 +34,18 @@ public class StringPrintWriter {
         }
     }
 
+    public void stylePrint(boolean isHtml, Ansi style, Object... obj) {
+        if (isHtml) {
+            for (Object o : obj) {
+                str.append(Ansi.applyHtml(o, style));
+            }
+        } else {
+            for (Object o : obj) {
+                str.append(Ansi.applyStyle(o, style));
+            }
+        }
+    }
+
     public void println(Object... obj) {
         print(obj);
         str.append('\n');
@@ -50,6 +62,18 @@ public class StringPrintWriter {
     public void printlnf(String format, Object... args) {
         str.append(String.format(format, args));
         str.append('\n');
+    }
+
+    public void stylePrintLnf(boolean isHtml, Ansi style, String format, Object... args) {
+        if (isHtml) {
+            for (Object arg : args) {
+                printlnf(Ansi.applyHtml(format, style), Ansi.applyHtml(arg, style));
+            }
+        } else {
+            for (Object arg : args) {
+                printlnf(format, Ansi.applyStyle(arg, style));
+            }
+        }
     }
 
     public void clear() {

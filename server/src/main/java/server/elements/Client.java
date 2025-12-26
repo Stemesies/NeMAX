@@ -20,7 +20,7 @@ public class Client {
      */
     public User user = null;
 
-    public ClientTypes type = null;
+    public ClientTypes type = ClientTypes.GUI;
     public ClientStates state = ClientStates.Fine;
 
     @Deprecated
@@ -43,6 +43,18 @@ public class Client {
      */
     public void sendln(Object message) throws IllegalStateException {
         socket.sendln(message.toString());
+    }
+
+    /**
+     * Отправляет отформатированное сообщение в зависимости от типа клиента.
+     */
+    public void styledSendln(Object message, Ansi style, boolean isHtml)
+        throws IllegalStateException {
+        if (isHtml) {
+            socket.sendln(Ansi.applyHtml(message, style));
+        } else {
+            socket.sendln(Ansi.applyStyle(message, style));
+        }
     }
 
     /**
@@ -77,13 +89,13 @@ public class Client {
         return user == null ? super.toString() : user.getName();
     }
 
-    public void sendMessageToChat(String content) {
+    public void sendMessageToChat(String content, boolean isHtml) {
         if (user == null) {
-            sendln(Ansi.Colors.RED.apply("You aren't logged in."));
+            styledSendln(("You aren't logged in."), Ansi.Colors.RED, true);
             return;
         }
         if (group == null) {
-            sendln(Ansi.Colors.RED.apply("No group opened."));
+            styledSendln("No group opened.", Ansi.Colors.RED, type == ClientTypes.GUI);
             return;
         }
         Message message = new Message(0, content, user.getName(), user.getId(),  null);
@@ -102,11 +114,30 @@ public class Client {
             if (client == null)
                 continue;
 
-            client.sendln(client != this
-                    ? strMessage
-                    : message.getFormattedSelf()
-            );
+            if (client != this) {
+                client.sendln(strMessage);
+            } else {
+                if (strMessage.length() <= 30)
+                    client.styledSendln(Message.getOffset(strMessage), Ansi.Colors.YELLOW,
+                            isHtml);
+                else {
+                    var partMsg = strMessage;
+                    var last = strMessage;
+                    for (int i = 0; !last.isEmpty(); i += 30) {
+                        if (last.length() < 30) {
+                            client.styledSendln(Message.getOffset(last), Ansi.Colors.YELLOW,
+                                    isHtml);
+                            break;
+                        } else {
+                            partMsg = last.substring(0, 31);
+                            last = last.substring(31, last.length());
 
+                            client.styledSendln(Message.getOffset(partMsg), Ansi.Colors.YELLOW,
+                                    isHtml);
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -114,8 +145,8 @@ public class Client {
         // noinspection SwitchStatementWithTooFewBranches
         switch (state) {
             case AwaitingType -> sendln("/request type");
-            default -> {}
+            default -> {
+            }
         }
     }
-
 }

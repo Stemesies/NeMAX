@@ -22,7 +22,7 @@ public class Client {
 
     public static void launch(ClientTypes type) {
         ServerRequestCommands.init();
-      
+
         ServerConnectManager.host = "127.0.0.1";
         ServerConnectManager.port = 8080;
         ServerConnectManager.connect();
