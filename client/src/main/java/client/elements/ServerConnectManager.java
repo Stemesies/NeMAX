@@ -1,5 +1,8 @@
 package client.elements;
 
+import client.elements.cli.ServerRequestCommands;
+import utils.cli.CommandProcessor;
+
 import utils.kt.Apply;
 import utils.network.SimpleSocket;
 
@@ -15,8 +18,6 @@ public class ServerConnectManager {
 
     public static String host;
     public static int port;
-
-    public static String message;
 
     public static SimpleSocket socket = null;
 
@@ -40,9 +41,11 @@ public class ServerConnectManager {
             socket = null;
         else {
             System.out.println("Connected to the server");
-            message = "Connected";
             processConnection();
-            outputListeners.forEach(it -> it.run(message));
+            outputListeners.forEach(it -> it.run("Connected to the server"));
+//            updateControllerMsg();
+//            System.out.println("Он должен быть в строке: " + HelloController.getMsg());
+
         }
     }
 
@@ -70,7 +73,12 @@ public class ServerConnectManager {
         new Thread(() -> {
             while (isConnected()) {
                 if (socket.hasNewMessage()) {
-                    message = socket.receiveMessage();
+                    var message = socket.receiveMessage();
+
+                    // Сервер прислал запрос. Отвечаем и ничего не выводим пользователю.
+                    if (ServerRequestCommands.processor.execute(message) == null)
+                        continue;
+
                     System.out.println(message);
                     outputListeners.forEach(it -> it.run(message));
 //                    updateControllerMsg();
