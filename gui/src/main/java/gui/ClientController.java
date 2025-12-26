@@ -30,9 +30,6 @@ public class ClientController implements Initializable {
     @FXML
     private TextField tf;
 
-//    @FXML
-//    private TextArea tar;
-
     @FXML
     private WebView receivedMsg;
 
@@ -96,17 +93,16 @@ public class ClientController implements Initializable {
                 receivedMsg.getEngine().loadContent(scrollHtml + webViewContents
                         + "<html><body style="
                         + "\"background-color: rgb(17, 147, 187); "
-                                + "font-style: italic; color: white; overflow-y: scroll;\">"
+                                + "font-style: italic; color: white; overflow-y: scroll;"
+                                + "overflow-x: scroll;\">"
                                 + "<pre>" + msgProperty().getValue() + "</pre>"
                         + "</body></html>");
+                var height = (int) receivedMsg.getEngine()
+                        .executeScript("document.body.scrollHeight; document.body.scrollWidth");
+                receivedMsg.setPrefHeight(height);
             }
         });
-//        receivedMsg.accessibleTextProperty().bindBidirectional(msgProperty());
 
-        // Если поле только для отображения (не может изменять значение MSG)
-//        tar.textProperty().bind(msgProperty());
-        // Если через это поле можно менять значение MSG
-//        tf.textProperty().bindBidirectional(MSGProperty());
         OutputManager.addOutPutListener(ClientController::setMsg);
     }
 
