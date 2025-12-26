@@ -57,10 +57,11 @@ public class ClientController implements Initializable {
 
     @FXML
     public void showServerResult() {
-        CompletableFuture.supplyAsync(() -> {
-            Client.launch(ClientTypes.GUI);
-            return null;
-        });
+//        CompletableFuture.supplyAsync(() -> {
+//            Client.launch(ClientTypes.GUI);
+//            return null;
+//        });
+        setInput("/retry");
     }
 
     public static String getMsg() {
@@ -91,7 +92,7 @@ public class ClientController implements Initializable {
             if (newVal == Worker.State.SUCCEEDED) {
                 receivedMsg.getEngine().loadContent(
                         "<html><body style=\"background-color: rgb(17, 147, 187); "
-                                + "font-style: italic;\">"
+                                + "font-style: italic; color: white;\">"
                                 + msgProperty().getValue() + "</body></html>");
             }
         });

@@ -12,7 +12,7 @@ public class ServerConnectManager {
     public String message;
 
     public static SimpleSocket socket = null;
-    private final CommandProcessor commandProcessor = new CommandProcessor();
+    private static final CommandProcessor commandProcessor = new CommandProcessor();
 
     public ServerConnectManager(String host, int port) {
         this.host = host;
@@ -37,7 +37,7 @@ public class ServerConnectManager {
             System.out.println("Connected to the server");
             this.message = "Connected";
             processConnection();
-            OutputManager.print(this.message);
+            OutputManager.stylePrint(this.message, Ansi.Colors.GREEN);
 //            OutputManager.getOutputListeners().forEach(it -> it.run(this.message));
 //            System.out.println("Он должен быть в строке: " + HelloController.getMsg());
         }

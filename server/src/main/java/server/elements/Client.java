@@ -1,5 +1,6 @@
 package server.elements;
 
+import utils.elements.ClientTypes;
 import utils.network.SimpleSocket;
 import utils.Ansi;
 import utils.Utils;
@@ -26,8 +27,15 @@ public class Client {
 
     private final SimpleSocket socket;
 
-    public Client(SimpleSocket socket) {
+    private final ClientTypes type;
+
+    public ClientTypes getType() {
+        return type;
+    }
+
+    public Client(SimpleSocket socket, ClientTypes type) {
         this.socket = socket;
+        this.type = type;
     }
 
     public void close() {
@@ -41,6 +49,18 @@ public class Client {
      */
     public void sendln(Object message) throws IllegalStateException {
         socket.sendln(message.toString());
+    }
+
+    /**
+     * Отправляет отформатированное сообщение в зависимости от типа клиента.
+     */
+    public void styledSendln(Object message, Ansi style, boolean isHtml)
+        throws IllegalStateException {
+        if (isHtml) {
+            socket.sendln(Ansi.applyHtml(message, style));
+        } else {
+            socket.sendln(Ansi.applyStyle(message, style));
+        }
     }
 
     /**
@@ -90,7 +110,8 @@ public class Client {
 
     public void sendMessageToChat(String message) {
         if (user == null) {
-            sendln(Ansi.Colors.RED.apply("You aren't logged in."));
+            styledSendln(("You aren't logged in."), Ansi.Colors.RED, true);
+            System.out.println("Я тут!");
             return;
         }
         if (group == null) {

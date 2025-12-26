@@ -1,6 +1,7 @@
 package server;
 
 import server.elements.Client;
+import utils.elements.ClientTypes;
 import utils.network.SimpleServerSocket;
 
 import java.util.ArrayList;
@@ -29,7 +30,9 @@ public class ServerMain {
                 var clSocket = socket.accept();
                 if (clSocket == null)
                     continue;
-                var client = new Client(clSocket);
+                // TODO: прописать логику определения,
+                //  какой клиент подключился к серверу
+                var client = new Client(clSocket, ClientTypes.GUI);
                 System.out.println("new client");
                 getClients().add(client);
                 processClient(client);

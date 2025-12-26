@@ -7,6 +7,7 @@ import server.elements.Group;
 import server.elements.ServerData;
 import server.elements.User;
 import utils.Ansi;
+import utils.elements.ClientTypes;
 import utils.extensions.CollectionExt;
 
 import server.managers.DatabaseManager;
@@ -29,7 +30,7 @@ public class ClientCommands {
     }
 
     private static final Condition<ClientContextData> requireAuth =
-        new Condition<>("You aren't logged in.", (ctx) ->
+        new Condition<>(Ansi.applyHtml("You aren't logged in.", Ansi.Colors.RED), (ctx) ->
             ctx.data.isAuthenticated()
         );
 
@@ -81,7 +82,10 @@ public class ClientCommands {
             .require(requireAuth)
             .executes((ctx) -> {
                 ctx.data.client.user = null;
-                ctx.out.println("Successfully logged out.");
+//                ctx.out.println("Successfully logged out.");
+                boolean isHtml = ctx.data.client.getType() == ClientTypes.GUI;
+                ctx.out.stylePrint(isHtml, Ansi.Colors.GREEN,
+                        "Successfully logged out.");
             })
         );
         processor.register("changeName", (a) -> a
@@ -115,7 +119,10 @@ public class ClientCommands {
                             (it) -> it.getUserName().equals(username)
                     );
                     if (user == null) {
-                        ctx.out.println(Ansi.Colors.RED.apply("User not found."));
+//                        ctx.out.println(Ansi.Colors.RED.apply("User not found."));
+                        boolean isHtml = ctx.data.client.getType() == ClientTypes.GUI;
+                        ctx.out.stylePrint(isHtml, Ansi.Colors.RED,
+                                "User not found.");
                         return;
                     }
 
@@ -134,7 +141,9 @@ public class ClientCommands {
                 var groupname = ctx.getString("groupname");
                 Group group = Group.getGroupByName(groupname);
                 if (group == null) {
-                    ctx.out.println(Ansi.Colors.RED.apply("Group not found."));
+                    boolean isHtml = ctx.data.client.getType() == ClientTypes.GUI;
+                    ctx.out.stylePrint(isHtml, Ansi.Colors.RED,
+                            "Group not found.");
                     return;
                 }
 
@@ -142,7 +151,9 @@ public class ClientCommands {
                     group.getMembersId(),
                     (it) -> it.equals(ctx.data.client.user.getUserId())
                 ) == null) {
-                    ctx.out.println(Ansi.Colors.RED.apply("You are not a member of that group."));
+                    boolean isHtml = ctx.data.client.getType() == ClientTypes.GUI;
+                    ctx.out.stylePrint(isHtml, Ansi.Colors.RED,
+                            "You are not a member of that group.");
                     return;
                 }
                 ctx.data.client.group = group;
@@ -158,9 +169,12 @@ public class ClientCommands {
             .subcommand("list", (b) -> b
                 .executes((ctx) -> {
                     var list = ctx.data.user.getFriendsId();
-                    if (list.isEmpty())
+                    if (list.isEmpty()) {
                         ctx.out.println("No friends.");
-                    else
+                        boolean isHtml = ctx.data.client.getType() == ClientTypes.GUI;
+                        ctx.out.stylePrint(isHtml, Ansi.Colors.RED,
+                                "No friends.");
+                    } else
                         list.forEach(ctx.out::println);
                 })
             )
