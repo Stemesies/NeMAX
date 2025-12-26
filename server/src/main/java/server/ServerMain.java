@@ -1,15 +1,17 @@
 package server;
 
 import server.elements.Client;
-import utils.elements.ClientTypes;
+import server.elements.ClientStates;
+import server.managers.DatabaseManager;
 import utils.network.SimpleServerSocket;
 
 import java.util.ArrayList;
 import java.util.Scanner;
 
 import static server.elements.ServerData.getClients;
+import static server.elements.ServerData.getRegisteredClients;
 
-public class ServerMain {
+public class  ServerMain {
     SimpleServerSocket socket = null;
     private final Scanner in = new Scanner(System.in);
 
@@ -30,9 +32,7 @@ public class ServerMain {
                 var clSocket = socket.accept();
                 if (clSocket == null)
                     continue;
-                // TODO: прописать логику определения,
-                //  какой клиент подключился к серверу
-                var client = new Client(clSocket, ClientTypes.GUI);
+                var client = new Client(clSocket);
                 System.out.println("new client");
                 getClients().add(client);
                 processClient(client);
@@ -79,9 +79,21 @@ public class ServerMain {
     public void processClient(Client client) {
         new Thread(() -> {
             System.out.printf("Client %s connected\n", client);
+            client.state = ClientStates.AwaitingType;
+            client.stateRequest();
 
             while (client.hasNewMessage()) {
                 var line = client.receiveMessage();
+
+                if (client.state != ClientStates.Fine) {
+                    ClientResponseCommands.processor.execute(
+                        line,
+                        new ClientResponseCommands.ClientContextData(client)
+                    );
+                    if (ClientResponseCommands.processor.getLastError() != null)
+                        client.stateRequest();
+                    continue;
+                }
 
                 if (line.charAt(0) == '/') {
                     var proc = ClientCommands.processor;
@@ -101,6 +113,7 @@ public class ServerMain {
             }
 
             getClients().remove(client);
+            getRegisteredClients().remove(client);
             System.out.printf("Client %s disconnected\n", client);
         }).start();
     }
@@ -121,7 +134,9 @@ public class ServerMain {
     }
 
     public static void main(String[] args) {
+        DatabaseManager.init();
         ClientCommands.init();
+        ClientResponseCommands.init();
         new ServerMain().start();
     }
 }

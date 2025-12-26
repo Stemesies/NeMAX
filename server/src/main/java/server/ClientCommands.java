@@ -10,9 +10,8 @@ import utils.Ansi;
 import utils.elements.ClientTypes;
 import utils.extensions.CollectionExt;
 
-import server.managers.DatabaseManager;
-
 public class ClientCommands {
+
     public static class ClientContextData {
         public Client client;
         public User user;
@@ -38,52 +37,48 @@ public class ClientCommands {
         new CustomCommandProcessor<>();
 
     public static void init() {
-        // TODO: Заменить
         accountCategoryInit();
         friendsCategoryInit();
         groupsCategoryInit();
-
-        DatabaseManager.init();
     }
 
     private static void accountCategoryInit() {
-        processor.register("require", (client) -> client
-                .isInvisible()
-                .subcommand("type", (type) -> type
-                        .executes((smth) -> {
-                            return;
-                        })
-                ));
         processor.register("register", (a) -> a
             .require("You are already logged in.", (ctx) -> !ctx.data.isAuthenticated())
             .requireArgument("username")
             .requireArgument("password")
-            .executes((ctx) ->
+            .executes((ctx) -> {
                 ctx.data.client.user = User.register(
                     ctx.out,
                     ctx.getString("username"),
                     ctx.getString("password")
-                )
-            )
+                );
+                if (ctx.data.client.user != null)
+                    ServerData.getRegisteredClients().add(ctx.data.client);
+            })
         );
         processor.register("login", (a) -> a
             .require("You are already logged in.", (ctx) -> !ctx.data.isAuthenticated())
             .requireArgument("username")
             .requireArgument("password")
-            .executes((ctx) ->
+            .executes((ctx) -> {
                 ctx.data.client.user = User.logIn(
                     ctx.out,
                     ctx.getString("username"),
                     ctx.getString("password")
-                )
-            )
+                );
+                if (ctx.data.client.user != null)
+                    ServerData.getRegisteredClients().add(ctx.data.client);
+            })
         );
         processor.register("logout", (a) -> a
             .require(requireAuth)
             .executes((ctx) -> {
                 ctx.data.client.user = null;
+                ServerData.getRegisteredClients().remove(ctx.data.client);
+                ctx.out.println("Successfully logged out.");
 //                ctx.out.println("Successfully logged out.");
-                boolean isHtml = ctx.data.client.getType() == ClientTypes.GUI;
+                boolean isHtml = ctx.data.client.type == ClientTypes.GUI;
                 ctx.out.stylePrint(isHtml, Ansi.Colors.GREEN,
                         "Successfully logged out.");
             })
@@ -113,14 +108,10 @@ public class ClientCommands {
             .findArgument("username")
             .executes((ctx) -> {
                 if (ctx.hasArgument("username")) {
-                    var username = ctx.getString("username");
-                    var user = CollectionExt.findBy(
-                            ServerData.getRegisteredUsers(),
-                            (it) -> it.getUserName().equals(username)
-                    );
+                    var user = User.getUserByUsername(ctx.getString("username"));
                     if (user == null) {
 //                        ctx.out.println(Ansi.Colors.RED.apply("User not found."));
-                        boolean isHtml = ctx.data.client.getType() == ClientTypes.GUI;
+                        boolean isHtml = ctx.data.client.type == ClientTypes.GUI;
                         ctx.out.stylePrint(isHtml, Ansi.Colors.RED,
                                 "User not found.");
                         return;
@@ -143,7 +134,7 @@ public class ClientCommands {
                 var groupname = ctx.getString("groupname");
                 Group group = Group.getGroupByName(groupname);
                 if (group == null) {
-                    boolean isHtml = ctx.data.client.getType() == ClientTypes.GUI;
+                    boolean isHtml = ctx.data.client.type == ClientTypes.GUI;
                     ctx.out.stylePrint(isHtml, Ansi.Colors.RED,
                             "Group not found.");
                     return;
@@ -151,16 +142,19 @@ public class ClientCommands {
 
                 if (CollectionExt.findBy(
                     group.getMembersId(),
-                    (it) -> it.equals(ctx.data.client.user.getUserId())
+                    (it) -> it.equals(ctx.data.client.user.getId())
                 ) == null) {
-                    boolean isHtml = ctx.data.client.getType() == ClientTypes.GUI;
+                    boolean isHtml = ctx.data.client.type == ClientTypes.GUI;
                     ctx.out.stylePrint(isHtml, Ansi.Colors.RED,
                             "You are not a member of that group.");
                     return;
                 }
                 ctx.data.client.group = group;
-                for (var m : group.getMessagesContent())
-                    ctx.data.client.sendln(m);
+                for (var m : group.getMessages())
+                    ctx.data.client.sendln(m.getSenderId() == ctx.data.client.user.getId()
+                        ? m.getFormattedSelf()
+                        : m.getFormatted()
+                    );
             })
         );
     }
@@ -173,7 +167,7 @@ public class ClientCommands {
                     var list = ctx.data.user.getFriendsId();
                     if (list.isEmpty()) {
                         ctx.out.println("No friends.");
-                        boolean isHtml = ctx.data.client.getType() == ClientTypes.GUI;
+                        boolean isHtml = ctx.data.client.type == ClientTypes.GUI;
                         ctx.out.stylePrint(isHtml, Ansi.Colors.RED,
                                 "No friends.");
                     } else

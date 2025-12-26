@@ -1,10 +1,11 @@
 package server.elements;
 
+import server.managers.DatabaseManager;
 import utils.Ansi;
 import utils.StringPrintWriter;
+import utils.elements.AbstractUser;
 import utils.extensions.CollectionExt;
 import utils.extensions.StringExt;
-import utils.elements.AbstractUser;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,8 +13,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
-import server.managers.DatabaseManager;
 
 public class User extends AbstractUser {
 
@@ -122,7 +121,7 @@ public class User extends AbstractUser {
 
     public static void addUser(User user) {
         String sql = "INSERT INTO users (username, name, password, salt)\n"
-                + "VALUES (?, ?, ?, ?);";
+            + "VALUES (?, ?, ?, ?);";
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -192,6 +191,7 @@ public class User extends AbstractUser {
 
                 if (storedPassword.equals(inputPassword)) {
                     User user = new User(username, password);
+                    user.name = rs.getString("name");
                     user.id = rs.getInt("id");
 
                     // Обновляем время последнего входа
@@ -219,8 +219,7 @@ public class User extends AbstractUser {
         // отправляет text второму пользователю id?
     }
 
-    @Override
-    public void setName(String name) {
+    public boolean setName(String name) {
         String sql = "UPDATE users SET name = ? WHERE id = ?";
 
         try (Connection conn = DatabaseManager.getConnection();
@@ -229,9 +228,13 @@ public class User extends AbstractUser {
             stmt.setString(1, name);
             stmt.setInt(2, this.id);
             stmt.executeUpdate();
+            this.name = name;
+
+            return true;
 
         } catch (SQLException e) {
             System.err.println("Error updating User`s name: " + e.getMessage());
+            return false;
         }
     }
 
@@ -288,10 +291,10 @@ public class User extends AbstractUser {
     public List<Integer> getFriendsId() {
         List<Integer> friends = new ArrayList<>();
         String sql = """
-               SELECT u.id FROM users u
-               JOIN user_friends uf ON (u.id = uf.friend_id AND uf.user_id = ?)
-                                           OR (u.id = uf.user_id AND uf.friend_id = ?)
-               WHERE u.id != ?""";
+            SELECT u.id FROM users u
+            JOIN user_friends uf ON (u.id = uf.friend_id AND uf.user_id = ?)
+                                        OR (u.id = uf.user_id AND uf.friend_id = ?)
+            WHERE u.id != ?""";
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -329,42 +332,32 @@ public class User extends AbstractUser {
         out.println("Successfully changed password.");
     }
 
-    @SuppressWarnings("checkstyle:LineLength")
     public String getProfile(boolean isHtml) {
-        // FIXME
-        var connectedCommand = CollectionExt.findBy(ServerData.getClients(), (it) -> it.user == this);
-        var onlineMode = connectedCommand == null ? "" : " • online";
+        var connectedCommand = CollectionExt.findBy(
+            ServerData.getClients(),
+            (it) -> it.user != null && it.user.id == this.id
+        );
+        var onlineLabel = connectedCommand == null ? "" : " • online";
 
         var boxSize = 50;
-        var trimmedName = StringExt.limit(this.name, boxSize - 6 - onlineMode.length());
+        var trimmedName = StringExt.limit(this.name, boxSize - 6 - onlineLabel.length());
         var trimmedUsername = StringExt.limit(this.userName, boxSize - 5);
 
         var headerColor = Ansi.BgColors.fromRgb(34, 55, 75);
 
 
-//            return """
-//            ┌%s┐
-//            │%s│
-//            │ @%s │
-//            │
-//            └%s┘
-//            """.formatted(
-//                    "─".repeat(boxSize - 2),
-//                    headerColor.applyChoose(" ", Ansi.Colors.WHITE, isHtml) + Ansi.applyChoose(Ansi.Modes.BOLD.and(headerColor), trimmedName)
-//                            + headerColor.apply(onlineMode + " ".repeat(boxSize - 3 - onlineMode.length() - trimmedName.length())),
-//                    this.userName + " ".repeat(boxSize - 5 - trimmedUsername.length()),
-//                    "─".repeat(boxSize - 2), Ansi.Colors.WHITE, isHtml);
-//        }
         return """
             ┌%s┐
-            │%s│
-            │ @%s │
+            │%s%s%s│
+            │ @%s%s │
             │
             └%s┘
             """.formatted(
                 "─".repeat(boxSize - 2),
-                Ansi.applyChoose(" ", headerColor, isHtml) + Ansi.applyChoose(trimmedName, Ansi.Modes.BOLD.and(headerColor), isHtml)
-                        + Ansi.applyChoose(onlineMode + " ".repeat(boxSize - 3 - onlineMode.length() - trimmedName.length()), headerColor, isHtml),
+                Ansi.applyChoose(" ", headerColor, isHtml) + Ansi.applyChoose(trimmedName,
+                        Ansi.Modes.BOLD.and(headerColor), isHtml)
+                        + Ansi.applyChoose(onlineLabel + " ".repeat(boxSize
+                        - 3 - onlineLabel.length() - trimmedName.length()), headerColor, isHtml),
                 this.userName + " ".repeat(boxSize - 5 - trimmedUsername.length()),
                 "─".repeat(boxSize - 2)
         );
@@ -372,8 +365,12 @@ public class User extends AbstractUser {
 
     // Возможно переименование в setName
     public void changeName(StringPrintWriter out, String nickname) {
-        setName(nickname);
-        out.println("Successfully changed nickname.");
+        if (setName(nickname)) {
+            out.println("Successfully changed nickname.");
+        } else {
+            out.println("Something went wrong!");
+        }
+
     }
 
     public void dismissFriendRequest(String username) {

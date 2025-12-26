@@ -1,7 +1,6 @@
 package client.elements;
 
 import client.elements.cli.ServersideCommands;
-import utils.Ansi;
 import utils.cli.CommandProcessor;
 import utils.elements.ClientTypes;
 
@@ -17,10 +16,7 @@ public class InputManager {
 
     public InputManager() {
         ServersideCommands.init(commandProcessor);
-    }
-
-    boolean isConnected() {
-        return ServerConnectManager.socket != null;
+        registerClientsideCommands();
     }
 
     public void startInputThread() {
@@ -50,25 +46,31 @@ public class InputManager {
             var procOutput = commandProcessor.getOutput();
             if (procError != null) {
                 if (procError.type == PHANTOM_COMMAND)
-                    send(msg);
+                    ServerConnectManager.send(msg);
                 else {
                     boolean isHtml = Client.getType() != ClientTypes.CONSOLE;
                     OutputManager.print(procError.getMessage(isHtml));
                 }
-            } else if (!procOutput.isEmpty()) {
+            } else if (!procOutput.isEmpty())
                 OutputManager.print(procOutput);
-            }
+
             return;
         }
-        send(msg);
+        ServerConnectManager.send(msg);
 
     }
 
-    private void send(String msg) {
-        if (isConnected())
-            ServerConnectManager.socket.sendln(msg);
-        else {
-            OutputManager.stylePrint("Not connected to server.", Ansi.Colors.RED);
-        }
+    /**
+     * Регистрирует команды для соединения с сервером.
+     */
+    private void registerClientsideCommands() {
+
+        commandProcessor.register("exit", (it) -> it
+            .executes(ServerConnectManager::exit)
+        );
+        commandProcessor.register("retry", (it) -> it
+            .require("Already connected.", ServerConnectManager::isDisconnected)
+            .executes(ServerConnectManager::connect)
+        );
     }
 }

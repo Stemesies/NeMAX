@@ -25,7 +25,7 @@ public abstract class AbstractUser {
         return request;
     }
 
-    public int getUserId() {
+    public int getId() {
         return this.id;
     }
 
@@ -44,8 +44,6 @@ public abstract class AbstractUser {
     public String getPassword() {
         return this.password;
     }
-
-    public abstract void setName(String name);
 
     public abstract void setPassword(String password);
 

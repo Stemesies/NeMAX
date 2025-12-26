@@ -3,8 +3,6 @@ package server.elements;
 import utils.elements.ClientTypes;
 import utils.network.SimpleSocket;
 import utils.Ansi;
-import utils.Utils;
-import utils.elements.Message;
 import utils.extensions.CollectionExt;
 
 /**
@@ -22,20 +20,16 @@ public class Client {
      */
     public User user = null;
 
+    public ClientTypes type = null;
+    public ClientStates state = ClientStates.Fine;
+
     @Deprecated
     public Group group = null;
 
     private final SimpleSocket socket;
 
-    private final ClientTypes type;
-
-    public ClientTypes getType() {
-        return type;
-    }
-
-    public Client(SimpleSocket socket, ClientTypes type) {
+    public Client(SimpleSocket socket) {
         this.socket = socket;
-        this.type = type;
     }
 
     public void close() {
@@ -95,59 +89,60 @@ public class Client {
         return user == null ? super.toString() : user.getName();
     }
 
-    /**
-     * Выводит сообщение от себя в чат пользователя.
-     *
-     * @param message - сообщение в чат
-     */
-    public String getOffset(String message) {
-        StringBuilder offset = new StringBuilder(280);
-        for (int i = 0; i < (110 - message.length()); i++) {
-            offset.append(" ");
-        }
-        return offset.toString() + message;
-    }
-
-    public void sendMessageToChat(String message) {
+    public void sendMessageToChat(String content) {
         if (user == null) {
             styledSendln(("You aren't logged in."), Ansi.Colors.RED, true);
-            System.out.println("Я тут!");
             return;
         }
         if (group == null) {
             sendln(Ansi.Colors.RED.apply("No group opened."));
             return;
         }
-        var chatMessage = Utils.createChatMessage(this, message);
+        Message message = new Message(0, content, user.getName(), user.getId(),  null);
+        var strMessage = message.getFormatted();
 
-        System.out.println(group.getGroupname() + ": " + chatMessage);
-        Message messageContent = new Message(0, chatMessage, user.getUserId(), null);
-        group.addMessage(messageContent);
+        System.out.println(group.getGroupname() + ": " + strMessage);
+
+        group.addMessage(message);
         for (var u : group.getMembersId()) {
-            var client = CollectionExt.findBy(ServerData.getClients(),
-                    (it) -> it.user.getUserId() == u);
+
+            var client = CollectionExt.findBy(
+                ServerData.getRegisteredClients(),
+                (it) -> it.user.getId() == u
+            );
+
             if (client == null)
                 continue;
+
             if (client != this) {
-                client.sendln(chatMessage);
+                client.sendln(strMessage);
             } else {
-                if (chatMessage.length() <= 30)
-                    client.sendln(getOffset(chatMessage));
+                if (strMessage.length() <= 30)
+                    client.sendln(Message.getOffset(strMessage));
                 else {
-                    var partMsg = chatMessage;
-                    var last = chatMessage;
+                    var partMsg = strMessage;
+                    var last = strMessage;
                     for (int i = 0; !last.isEmpty(); i += 30) {
                         if (last.length() < 30) {
-                            client.sendln(getOffset(last));
+                            client.sendln(Message.getOffset(last));
                             break;
                         } else {
                             partMsg = last.substring(0, 31);
                             last = last.substring(31, last.length());
 
-                            client.sendln(getOffset(partMsg));
+                            client.sendln(Message.getOffset(partMsg));
                         }
                     }
                 }
+            }
+        }
+    }
+
+    public void stateRequest() {
+        // noinspection SwitchStatementWithTooFewBranches
+        switch (state) {
+            case AwaitingType -> sendln("/request type");
+            default -> {
             }
         }
     }
