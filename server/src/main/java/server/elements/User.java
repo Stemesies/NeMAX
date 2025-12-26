@@ -330,7 +330,7 @@ public class User extends AbstractUser {
     }
 
     @SuppressWarnings("checkstyle:LineLength")
-    public String getProfile() {
+    public String getProfile(boolean isHtml) {
         // FIXME
         var connectedCommand = CollectionExt.findBy(ServerData.getClients(), (it) -> it.user == this);
         var onlineMode = connectedCommand == null ? "" : " • online";
@@ -342,6 +342,19 @@ public class User extends AbstractUser {
         var headerColor = Ansi.BgColors.fromRgb(34, 55, 75);
 
 
+//            return """
+//            ┌%s┐
+//            │%s│
+//            │ @%s │
+//            │
+//            └%s┘
+//            """.formatted(
+//                    "─".repeat(boxSize - 2),
+//                    headerColor.applyChoose(" ", Ansi.Colors.WHITE, isHtml) + Ansi.applyChoose(Ansi.Modes.BOLD.and(headerColor), trimmedName)
+//                            + headerColor.apply(onlineMode + " ".repeat(boxSize - 3 - onlineMode.length() - trimmedName.length())),
+//                    this.userName + " ".repeat(boxSize - 5 - trimmedUsername.length()),
+//                    "─".repeat(boxSize - 2), Ansi.Colors.WHITE, isHtml);
+//        }
         return """
             ┌%s┐
             │%s│
@@ -350,8 +363,8 @@ public class User extends AbstractUser {
             └%s┘
             """.formatted(
                 "─".repeat(boxSize - 2),
-                headerColor.apply(" ") + Ansi.Modes.BOLD.and(headerColor).apply(trimmedName)
-                        + headerColor.apply(onlineMode + " ".repeat(boxSize - 3 - onlineMode.length() - trimmedName.length())),
+                Ansi.applyChoose(" ", headerColor, isHtml) + Ansi.applyChoose(trimmedName, Ansi.Modes.BOLD.and(headerColor), isHtml)
+                        + Ansi.applyChoose(onlineMode + " ".repeat(boxSize - 3 - onlineMode.length() - trimmedName.length()), headerColor, isHtml),
                 this.userName + " ".repeat(boxSize - 5 - trimmedUsername.length()),
                 "─".repeat(boxSize - 2)
         );

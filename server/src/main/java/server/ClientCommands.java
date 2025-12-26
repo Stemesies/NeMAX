@@ -126,10 +126,12 @@ public class ClientCommands {
                         return;
                     }
 
-                    ctx.out.print(user.getProfile());
+//                    ctx.out.print(user.getProfile());
+                    ctx.out.stylePrint(true, Ansi.Colors.BLUE,
+                            user.getProfile(true));
                     // TODO: получаем и отображаем профиль человека
                 } else {
-                    ctx.out.println(ctx.data.user.getProfile());
+                    ctx.out.println(ctx.data.user.getProfile(true));
                 }
             })
         );

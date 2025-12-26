@@ -20,10 +20,10 @@ public class OutputManager {
         if (Client.getType() == ClientTypes.GUI) {
             System.out.println(msg);
             outputListeners.forEach(it -> it.run(msg));
-            System.out.println("printing to GUI");
+//            System.out.println("printing to GUI");
         } else {
             outputListeners.forEach(it -> it.run(message));
-            System.out.println("printing to CONSOLE");
+//            System.out.println("printing to CONSOLE");
         }
     }
 

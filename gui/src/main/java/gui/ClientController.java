@@ -69,7 +69,7 @@ public class ClientController implements Initializable {
     }
 
     public static void setMsg(String msg) {
-        System.out.println("Output: " + msg);
+//        System.out.println("Output: " + msg);
         output.println(msg + "<br>");
         MSG.set(output.toString());
     }
@@ -85,15 +85,19 @@ public class ClientController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         ServerCommands.initGeneral();
 
+        StringBuilder scrollHtml = scrollWebView(0, 1000);
+        String webViewContents = (String) receivedMsg.getEngine()
+                .executeScript("document.documentElement.outerHTML");
+
         receivedMsg.getEngine().loadContent("some content");
 
         receivedMsg.getEngine().getLoadWorker().stateProperty().addListener((
                 obs, oldVal, newVal) -> {
             if (newVal == Worker.State.SUCCEEDED) {
-                receivedMsg.getEngine().loadContent(
-                        "<html><body style=\"background-color: rgb(17, 147, 187); "
+                receivedMsg.getEngine().loadContent(scrollHtml + webViewContents
+                        + "<html><body style=\"background-color: rgb(17, 147, 187); "
                                 + "font-style: italic; color: white;\">"
-                                + msgProperty().getValue() + "</body></html>");
+                                + "<pre>" + msgProperty().getValue() + "</pre>" + "</body></html>");
             }
         });
 //        receivedMsg.accessibleTextProperty().bindBidirectional(msgProperty());
@@ -164,5 +168,20 @@ public class ClientController implements Initializable {
     @FXML
     public void onLogIn() {
         setInput("/login " + tf.getText());
+    }
+
+    @SuppressWarnings("checkstyle:ParameterName")
+    public static StringBuilder scrollWebView(int xPos, int yPos) {
+        StringBuilder script = new StringBuilder().append("<html>");
+        script.append("<head>");
+        script.append("   <script language=\"javascript\" type=\"text/javascript\">");
+        script.append("       function toBottom(){");
+        script.append("           window.scrollTo(0, document.body.scrollHeight, \"smooth\");");
+        script.append("       }");
+        script.append("   </script>");
+        script.append("</head>");
+        script.append("<body onload='toBottom()'>");
+
+        return script;
     }
 }
