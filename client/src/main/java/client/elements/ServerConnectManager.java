@@ -1,6 +1,8 @@
 package client.elements;
 
+import client.elements.cli.ServerRequestCommands;
 import utils.cli.CommandProcessor;
+
 import utils.kt.Apply;
 import utils.network.SimpleSocket;
 
@@ -14,39 +16,36 @@ public class ServerConnectManager {
         outputListeners.add(listener);
     }
 
-    public final String host;
-    public final int port;
-
-    public String message;
+    public static String host;
+    public static int port;
 
     public static SimpleSocket socket = null;
-    private final CommandProcessor commandProcessor = new CommandProcessor();
 
-    public ServerConnectManager(String host, int port) {
-        this.host = host;
-        this.port = port;
-        registerClientsideCommands();
+    public static void send(String msg) {
+        if (isConnected())
+            socket.sendln(msg);
+        else
+            System.err.println("Not connected to server.");
     }
 
-    boolean isConnected() {
+    static boolean isConnected() {
         return socket != null;
     }
 
     /**
      * Создает, если это возможно, соединение с сервером и начинает прослушивать сообщения.
      */
-    public void connect() {
+    public static void connect() {
         socket = new SimpleSocket(host, port);
         if (socket.isClosed())
             socket = null;
         else {
             System.out.println("Connected to the server");
-            this.message = "Connected";
             processConnection();
-            System.out.println("Здесь лежит не нулл! " + this.message);
-            outputListeners.forEach(it -> it.run(this.message));
+            outputListeners.forEach(it -> it.run("Connected to the server"));
 //            updateControllerMsg();
 //            System.out.println("Он должен быть в строке: " + HelloController.getMsg());
+
         }
     }
 
@@ -63,20 +62,25 @@ public class ServerConnectManager {
         System.out.println("Disconnected from the server");
     }
 
-    boolean isDisconnected() {
+    static boolean isDisconnected() {
         return socket == null;
     }
 
     /**
      * Создание потока для подключения к серверу.
      */
-    public void processConnection() {
+    public static void processConnection() {
         new Thread(() -> {
             while (isConnected()) {
                 if (socket.hasNewMessage()) {
-                    this.message = socket.receiveMessage();
-                    System.out.println(this.message);
-                    outputListeners.forEach(it -> it.run(this.message));
+                    var message = socket.receiveMessage();
+
+                    // Сервер прислал запрос. Отвечаем и ничего не выводим пользователю.
+                    if (ServerRequestCommands.processor.execute(message) == null)
+                        continue;
+
+                    System.out.println(message);
+                    outputListeners.forEach(it -> it.run(message));
 //                    updateControllerMsg();
                 } else {
                     disconnect();
@@ -89,19 +93,5 @@ public class ServerConnectManager {
     public static void exit() {
         disconnect();
         System.exit(0);
-    }
-
-    /**
-     * Регистрирует команды для соединения с сервером.
-     */
-    private void registerClientsideCommands() {
-
-        commandProcessor.register("exit", (it) -> it
-                .executes(ServerConnectManager::exit)
-        );
-        commandProcessor.register("retry", (it) -> it
-                .require("Already connected.", this::isDisconnected)
-                .executes(this::connect)
-        );
     }
 }

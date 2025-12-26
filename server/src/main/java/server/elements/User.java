@@ -191,6 +191,7 @@ public class User extends AbstractUser {
 
                 if (storedPassword.equals(inputPassword)) {
                     User user = new User(username, password);
+                    user.name = rs.getString("name");
                     user.id = rs.getInt("id");
 
                     // Обновляем время последнего входа
@@ -226,8 +227,10 @@ public class User extends AbstractUser {
             stmt.setString(1, name);
             stmt.setInt(2, this.id);
             stmt.executeUpdate();
+            this.name = name;
+          
             return true;
-
+     
         } catch (SQLException e) {
             System.err.println("Error updating User`s name: " + e.getMessage());
             return false;
