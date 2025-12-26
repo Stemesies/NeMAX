@@ -29,6 +29,7 @@
 .text-area {
     /* -fx-background-color: rgb(17, 147, 187); */
     -fx-control-inner-background: rgb(17, 147, 187);
+    -fx-text-fill: rgb(142, 237, 137);
 }
 
 .title {
