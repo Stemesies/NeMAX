@@ -45,8 +45,6 @@ public abstract class AbstractUser {
         return this.password;
     }
 
-    public abstract void setName(String name);
-
     public abstract void setPassword(String password);
 
     public abstract void addFriend(int id);
