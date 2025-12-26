@@ -11,8 +11,6 @@ import utils.extensions.CollectionExt;
 
 import server.managers.DatabaseManager;
 
-import java.util.Objects;
-
 public class ClientCommands {
     public static class ClientContextData {
         public Client client;
@@ -134,13 +132,14 @@ public class ClientCommands {
             .requireArgument("groupname")
             .executes((ctx) -> {
                 var groupname = ctx.getString("groupname");
-                if (!Group.groupExists(groupname)) {
+                Group group = Group.getGroupByName(groupname);
+                if (group == null) {
                     ctx.out.println(Ansi.Colors.RED.apply("Group not found."));
                     return;
                 }
-                Group group = Group.getGroupByName(groupname);
+
                 if (CollectionExt.findBy(
-                    Objects.requireNonNull(group).getMembersId(),
+                    group.getMembersId(),
                     (it) -> it.equals(ctx.data.client.user.getUserId())
                 ) == null) {
                     ctx.out.println(Ansi.Colors.RED.apply("You are not a member of that group."));
