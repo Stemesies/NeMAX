@@ -1,5 +1,6 @@
 package client.elements;
 
+import utils.Ansi;
 import utils.cli.CommandProcessor;
 import utils.network.SimpleSocket;
 
@@ -28,15 +29,15 @@ public class ServerConnectManager {
      */
     public void connect() {
         socket = new SimpleSocket(host, port);
-        if (socket.isClosed())
+
+        if (socket.isClosed()) {
             socket = null;
-        else {
+            OutputManager.stylePrint("Can't connect to server.", Ansi.Colors.RED);
+        } else {
             System.out.println("Connected to the server");
             this.message = "Connected";
             processConnection();
-            System.out.println("Здесь лежит не нулл! " + this.message);
             OutputManager.print(this.message);
-            OutputManager.stylePrint(message);
 //            OutputManager.getOutputListeners().forEach(it -> it.run(this.message));
 //            System.out.println("Он должен быть в строке: " + HelloController.getMsg());
         }
@@ -52,7 +53,6 @@ public class ServerConnectManager {
 
         socket.close();
         socket = null;
-        System.out.println("Disconnected from the server");
         OutputManager.print("Disconnected from the server");
     }
 
@@ -68,9 +68,7 @@ public class ServerConnectManager {
             while (isConnected()) {
                 if (socket.hasNewMessage()) {
                     this.message = socket.receiveMessage();
-                    System.out.println(this.message);
                     OutputManager.print(this.message);
-                    OutputManager.stylePrint(this.message);
 //                    updateControllerMsg();
                 } else {
                     disconnect();

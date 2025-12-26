@@ -1,7 +1,9 @@
 package client.elements;
 
 import client.elements.cli.ServersideCommands;
+import utils.Ansi;
 import utils.cli.CommandProcessor;
+import utils.elements.ClientTypes;
 
 import java.util.Scanner;
 
@@ -49,14 +51,15 @@ public class InputManager {
             if (procError != null) {
                 if (procError.type == PHANTOM_COMMAND)
                     send(msg);
-                else
-                    procError.explain();
-            } else if (!procOutput.isEmpty())
-                System.out.print(procOutput);
-
+                else {
+                    boolean isHtml = Client.getType() != ClientTypes.CONSOLE;
+                    OutputManager.print(procError.getMessage(isHtml));
+                }
+            } else if (!procOutput.isEmpty()) {
+                OutputManager.print(procOutput);
+            }
             return;
         }
-
         send(msg);
 
     }
@@ -64,7 +67,8 @@ public class InputManager {
     private void send(String msg) {
         if (isConnected())
             ServerConnectManager.socket.sendln(msg);
-        else
-            System.err.println("Not connected to server.");
+        else {
+            OutputManager.stylePrint("Not connected to server.", Ansi.Colors.RED);
+        }
     }
 }

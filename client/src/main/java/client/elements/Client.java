@@ -26,9 +26,9 @@ public class Client {
     public static HashMap<String, ArrayList<String>> unread = new HashMap<>(20);
 
     public static void launch(ClientTypes type) {
+        setType(type);
         scm.connect();
         System.out.println("Я жив!");
-        setType(type);
     }
 
     /**

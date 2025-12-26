@@ -7,7 +7,6 @@ import javafx.concurrent.Worker;
 import javafx.scene.web.WebView;
 import utils.StringPrintWriter;
 import utils.elements.ClientTypes;
-import client.elements.ServerConnectManager;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -92,7 +91,7 @@ public class ClientController implements Initializable {
             if (newVal == Worker.State.SUCCEEDED) {
                 receivedMsg.getEngine().loadContent(
                         "<html><body style=\"background-color: rgb(17, 147, 187); "
-                                + "font-family: Segoe UI; text-fill: rgb(142, 237, 137)\">"
+                                + "font-style: italic;\">"
                                 + msgProperty().getValue() + "</body></html>");
             }
         });

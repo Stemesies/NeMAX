@@ -16,8 +16,7 @@
             </VBox.margin>
         </Label>
     </HBox>
-   <WebView fx:id="receivedMsg" fontScale="2.0" prefHeight="450.0" prefWidth="574.0"
-            stylesheets="@styles.css"/>
+   <WebView fx:id="receivedMsg" fontScale="1.6" prefHeight="450.0" prefWidth="574.0" stylesheets="@styles.css" />
 
 <!--    <TextArea fx:id="receivedMsg" layoutX="21.0" layoutY="97.0" prefHeight="450.0" prefWidth="574.0" styleClass="text-area" stylesheets="@styles.css">-->
 <!--        <font>-->

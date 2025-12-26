@@ -93,6 +93,23 @@ public class Ansi {
     }
 
     /**
+     * Форматирует вывод для UI.
+     */
+    public static String applyHtml(Object msg, Ansi style) {
+        return style.openSpan + msg + style.closeSpan;
+    }
+
+    /**
+     * Выбираем, что применить.
+     */
+    public static String applyChoose(Object msg, Ansi style, boolean isHtml) {
+        if (isHtml) {
+            return applyHtml(msg, style);
+        }
+        return applyStyle(msg, style);
+    }
+
+    /**
      * Убирает последний написанный в консоли символ.
      * <br>
      * <br>Встроенная консоль Intellij IDEA не поддерживает эту функцию.
