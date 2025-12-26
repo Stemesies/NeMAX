@@ -49,6 +49,30 @@ public class User extends AbstractUser {
         return null;
     }
 
+    public static User getUserByUsername(String username) {
+        String sql = "SELECT * FROM users WHERE username = ?";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                String password = rs.getString("password");
+                User user = new User(username, password);
+                user.name = rs.getString("name");
+                user.id = rs.getInt("id");
+
+                return user;
+            }
+        } catch (SQLException e) {
+            System.err.println("Error: " + e.getMessage());
+        }
+
+        return null;
+    }
+
     public static Integer getUserIdByUsername(String username) {
         String sql = "SELECT id FROM users WHERE username = ?";
 
@@ -132,11 +156,10 @@ public class User extends AbstractUser {
             return null;
         }
 
-        var user = new User(username, password);
+        addUser(new User(username, password));
         out.println("Registered successfully.");
-        addUser(user);
-        ServerData.addUser(user);
-        return user;
+
+        return getUserByUsername(username);
     }
 
     public static void updateLastOnline(String username) {
