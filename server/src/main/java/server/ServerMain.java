@@ -85,15 +85,21 @@ public class ServerMain {
             while (client.hasNewMessage()) {
                 var line = client.receiveMessage();
 
-                if (client.state != ClientStates.Fine) {
-                    ClientResponseCommands.processor.execute(
-                        line,
-                        new ClientResponseCommands.ClientContextData(client)
-                    );
-                    if (ClientResponseCommands.processor.getLastError() != null)
-                        client.stateRequest();
+
+                ClientResponseCommands.processor.execute(
+                    line,
+                    new ClientResponseCommands.ClientContextData(client)
+                );
+                if (ClientResponseCommands.processor.getLastError() != null) {
+                    client.stateRequest();
+                } else {
+                    var out = ClientResponseCommands.processor.getOutput();
+                    if (!out.isEmpty())
+                        client.sendln(out);
                     continue;
                 }
+
+
 
                 if (line.charAt(0) == '/') {
                     var proc = ClientCommands.processor;

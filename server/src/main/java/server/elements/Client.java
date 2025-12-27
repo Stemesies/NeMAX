@@ -3,7 +3,6 @@ package server.elements;
 import utils.elements.ClientTypes;
 import utils.network.SimpleSocket;
 import utils.Ansi;
-import utils.extensions.CollectionExt;
 
 /**
  * Репрезентация клиента со стороны сервера.
@@ -23,7 +22,6 @@ public class Client {
     public ClientTypes type = null;
     public ClientStates state = ClientStates.Fine;
 
-    @Deprecated
     public Group group = null;
 
     private final SimpleSocket socket;
@@ -94,10 +92,7 @@ public class Client {
         group.addMessage(message);
         for (var u : group.getMembersId()) {
 
-            var client = CollectionExt.findBy(
-                ServerData.getRegisteredClients(),
-                (it) -> it.user.getId() == u
-            );
+            var client = ServerData.findClient(u);
 
             if (client == null)
                 continue;

@@ -74,10 +74,13 @@ public class ServerConnectManager {
             while (isConnected()) {
                 if (socket.hasNewMessage()) {
                     var message = socket.receiveMessage();
+                    if (message.isEmpty())
+                        continue;
 
                     // Сервер прислал запрос. Отвечаем и ничего не выводим пользователю.
-                    if (ServerRequestCommands.processor.execute(message) == null)
+                    if (ServerRequestCommands.processor.execute(message) == null) {
                         continue;
+                    }
 
                     System.out.println(message);
                     outputListeners.forEach(it -> it.run(message));
