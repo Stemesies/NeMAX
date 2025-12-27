@@ -116,7 +116,7 @@ public class  ServerMain {
                     continue;
                 }
 
-                client.sendMessageToChat(line, isHtml);
+                client.sendMessageToChat(line);
             }
 
             getClients().remove(client);

@@ -1,6 +1,7 @@
 package server.elements;
 
 import utils.Ansi;
+import utils.StringPrintWriter;
 
 import java.sql.Timestamp;
 
@@ -48,4 +49,41 @@ public class Message {
     public static String getOffset(String message) {
         return " ".repeat(Math.max(0, (110 - message.length())));
     }
+
+    public String asForeign() {
+        StringPrintWriter writer = new StringPrintWriter();
+        var partMsg = getFormatted();
+        var last = getFormatted();
+        for (int i = 0; !last.isEmpty(); i += 30) {
+            if (last.length() <= 30) {
+                writer.println(last);
+                break;
+            } else {
+                partMsg = last.substring(0, 31);
+                last = last.substring(31);
+                writer.println(partMsg);
+            }
+        }
+        return writer.toString();
+    }
+
+    public String asSelf(boolean isHtml) {
+        StringPrintWriter writer = new StringPrintWriter();
+        writer.printAsHtml = isHtml;
+        var partMsg = getFormatted();
+        var last = getFormatted();
+
+        for (int i = 0; !last.isEmpty(); i += 30) {
+            if (last.length() <= 30) {
+                writer.stylePrintln(Ansi.Colors.YELLOW, Message.getOffset(last) + last);
+                break;
+            } else {
+                partMsg = last.substring(0, 31);
+                last = last.substring(31);
+                writer.stylePrintln(Ansi.Colors.YELLOW, Message.getOffset(partMsg) + partMsg);
+            }
+        }
+        return writer.toString();
+    }
+
 }

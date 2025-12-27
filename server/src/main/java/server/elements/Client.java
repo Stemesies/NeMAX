@@ -88,7 +88,7 @@ public class Client {
         return user == null ? super.toString() : user.getName();
     }
 
-    public void sendMessageToChat(String content, boolean isHtml) {
+    public void sendMessageToChat(String content) {
         if (user == null) {
             styledSendln(("You aren't logged in."), Ansi.Colors.RED, true);
             return;
@@ -111,40 +111,9 @@ public class Client {
                 continue;
 
             if (client != this) {
-                var partMsg = strMessage;
-                var last = strMessage;
-                for (int i = 0; !last.isEmpty(); i += 30) {
-                    if (last.length() <= 30) {
-                        client.sendln(last);
-                        break;
-                    } else {
-                        partMsg = last.substring(0, 31);
-                        last = last.substring(31);
-
-                        client.sendln(partMsg);
-                    }
-                }
+                client.send(message.asForeign());
             } else {
-                if (strMessage.length() <= 30)
-                    client.styledSendln(Message.getOffset(strMessage), Ansi.Colors.YELLOW,
-                            isHtml);
-                else {
-                    var partMsg = strMessage;
-                    var last = strMessage;
-                    for (int i = 0; !last.isEmpty(); i += 30) {
-                        if (last.length() <= 30) {
-                            client.styledSendln(Message.getOffset(last) + last, Ansi.Colors.YELLOW,
-                                    isHtml);
-                            break;
-                        } else {
-                            partMsg = last.substring(0, 31);
-                            last = last.substring(31);
-
-                            client.styledSendln(Message.getOffset(partMsg)
-                                    + partMsg, Ansi.Colors.YELLOW, isHtml);
-                        }
-                    }
-                }
+                client.send(message.asSelf(client.type == ClientTypes.GUI));
             }
         }
     }
