@@ -197,7 +197,8 @@ public class User extends AbstractUser {
                     // Обновляем время последнего входа
                     updateLastOnline(user.name);
 
-                    out.printlnf("Logged in as %s.", user.name);
+//                    out.printlnf("Logged in as %s.", user.name);
+                    out.stylePrintLnf(Ansi.Colors.GREEN, "Logged in as %s.", user.name);
                     return user;
                 } else {
                     out.println(Ansi.Colors.RED.apply("Invalid password."));
@@ -228,9 +229,9 @@ public class User extends AbstractUser {
             stmt.setInt(2, this.id);
             stmt.executeUpdate();
             this.name = name;
-          
+
             return true;
-     
+
         } catch (SQLException e) {
             System.err.println("Error updating User`s name: " + e.getMessage());
             return false;
@@ -331,7 +332,7 @@ public class User extends AbstractUser {
         out.println("Successfully changed password.");
     }
 
-    public String getProfile() {
+    public String getProfile(boolean isHtml) {
         var connectedCommand = CollectionExt.findBy(
             ServerData.getClients(),
             (it) -> it.user != null && it.user.id == this.id
@@ -344,6 +345,7 @@ public class User extends AbstractUser {
 
         var headerColor = Ansi.BgColors.fromRgb(34, 55, 75);
 
+
         return """
             ┌%s┐
             │%s%s%s│
@@ -351,15 +353,15 @@ public class User extends AbstractUser {
             │
             └%s┘
             """.formatted(
-            "─".repeat(boxSize - 2),
-            headerColor.apply(" "),
-            Ansi.Modes.BOLD.and(headerColor).apply(trimmedName) + headerColor.apply(onlineLabel),
-            headerColor.apply(
-                " ".repeat(boxSize - 3 - onlineLabel.length() - trimmedName.length())
-            ),
-            this.userName,
-            " ".repeat(boxSize - 5 - trimmedUsername.length()),
-            "─".repeat(boxSize - 2)
+                "─".repeat(boxSize - 2),
+                Ansi.applyChoose(" ", headerColor, isHtml),
+                Ansi.applyChoose(trimmedName, Ansi.Modes.BOLD.and(headerColor), isHtml)
+                        + Ansi.applyChoose(onlineLabel, headerColor, isHtml),
+                Ansi.applyChoose(" ".repeat(boxSize - 3
+                        - onlineLabel.length() - trimmedName.length()), headerColor, isHtml),
+                this.userName,
+                " ".repeat(boxSize - 5 - trimmedUsername.length()),
+                "─".repeat(boxSize - 2)
         );
     }
 
@@ -379,8 +381,8 @@ public class User extends AbstractUser {
 
     public List<Group> getGroups() {
         var list = new ArrayList<Group>();
-        String sql = "SELECT * FROM group_members gm JOIN " +
-            "groups g ON gm.group_id=g.id WHERE user_id = ?";
+        String sql = "SELECT * FROM group_members gm JOIN "
+            + "groups g ON gm.group_id=g.id WHERE user_id = ?";
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

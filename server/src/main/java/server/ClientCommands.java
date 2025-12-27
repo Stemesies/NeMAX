@@ -7,6 +7,7 @@ import server.elements.Group;
 import server.elements.ServerData;
 import server.elements.User;
 import utils.Ansi;
+import utils.elements.ClientTypes;
 import utils.extensions.CollectionExt;
 
 public class ClientCommands {
@@ -28,7 +29,7 @@ public class ClientCommands {
     }
 
     private static final Condition<ClientContextData> requireAuth =
-        new Condition<>("You aren't logged in.", (ctx) ->
+        new Condition<>(Ansi.applyHtml("You aren't logged in.", Ansi.Colors.RED), (ctx) ->
             ctx.data.isAuthenticated()
         );
 
@@ -76,6 +77,9 @@ public class ClientCommands {
                 ctx.data.client.user = null;
                 ServerData.getRegisteredClients().remove(ctx.data.client);
                 ctx.out.println("Successfully logged out.");
+//                ctx.out.println("Successfully logged out.");
+                ctx.out.stylePrint(Ansi.Colors.GREEN,
+                        "Successfully logged out.");
             })
         );
         processor.register("changeName", (a) -> a
@@ -105,12 +109,15 @@ public class ClientCommands {
                 if (ctx.hasArgument("username")) {
                     var user = User.getUserByUsername(ctx.getString("username"));
                     if (user == null) {
-                        ctx.out.println(Ansi.Colors.RED.apply("User not found."));
+                        ctx.out.stylePrint(Ansi.Colors.RED, "User not found.");
                         return;
                     }
-                    ctx.out.print(user.getProfile());
+
+//                    ctx.out.print(user.getProfile());
+                    ctx.out.println(user.getProfile(ctx.out.printAsHtml));
+                    // TODO: получаем и отображаем профиль человека
                 } else {
-                    ctx.out.println(ctx.data.user.getProfile());
+                    ctx.out.println(ctx.data.user.getProfile(ctx.out.printAsHtml));
                 }
             })
         );
@@ -122,7 +129,7 @@ public class ClientCommands {
                 var groupname = ctx.getString("groupname");
                 Group group = Group.getGroupByName(groupname);
                 if (group == null) {
-                    ctx.out.println(Ansi.Colors.RED.apply("Group not found."));
+                    ctx.out.stylePrint(Ansi.Colors.RED, "Group not found.");
                     return;
                 }
 
@@ -130,13 +137,14 @@ public class ClientCommands {
                     group.getMembersId(),
                     (it) -> it.equals(ctx.data.client.user.getId())
                 ) == null) {
-                    ctx.out.println(Ansi.Colors.RED.apply("You are not a member of that group."));
+                    ctx.out.stylePrint(Ansi.Colors.RED, "You are not a member of that group.");
                     return;
                 }
                 ctx.data.client.group = group;
+                boolean isHtml = ctx.data.client.type == ClientTypes.GUI;
                 for (var m : group.getMessages())
                     ctx.data.client.sendln(m.getSenderId() == ctx.data.client.user.getId()
-                        ? m.getFormattedSelf()
+                        ? m.getFormattedSelf(isHtml)
                         : m.getFormatted()
                     );
             })
@@ -149,9 +157,10 @@ public class ClientCommands {
             .subcommand("list", (b) -> b
                 .executes((ctx) -> {
                     var list = ctx.data.user.getFriendsId();
-                    if (list.isEmpty())
+                    if (list.isEmpty()) {
                         ctx.out.println("No friends.");
-                    else
+                        ctx.out.stylePrint(Ansi.Colors.RED, "No friends.");
+                    } else
                         list.forEach(ctx.out::println);
                 })
             )

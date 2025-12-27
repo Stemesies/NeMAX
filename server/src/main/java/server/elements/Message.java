@@ -23,11 +23,9 @@ public class Message {
         return "[" + senderName + "] " + content;
     }
 
-    public String getFormattedSelf() {
-        var offset = 100 - getFormatted().length();
-        return Ansi.Colors.YELLOW.apply(
-            " ".repeat(Math.max(offset, 0)) + getFormatted()
-        );
+    public String getFormattedSelf(boolean isHtml) {
+        var offset = getOffset(getFormatted());
+        return Ansi.applyChoose(offset + getFormatted(), Ansi.Colors.YELLOW, isHtml);
     }
 
     public String getContent() {
@@ -40,5 +38,14 @@ public class Message {
 
     public int getSenderId() {
         return senderId;
+    }
+
+    /**
+     * Выводит сообщение от себя в чат пользователя.
+     *
+     * @param message - сообщение в чат
+     */
+    public static String getOffset(String message) {
+        return " ".repeat(Math.max(0, (110 - message.length()))) + message;
     }
 }

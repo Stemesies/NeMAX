@@ -20,6 +20,7 @@ public class Client {
     public static HashMap<String, ArrayList<String>> unread = new HashMap<>(20);
 
     public static void launch(ClientTypes type) {
+        Client.type = type;
         ServerRequestCommands.init();
         ServersideCommands.init(InputManager.commandProcessor);
         InputManager.registerClientsideCommands();

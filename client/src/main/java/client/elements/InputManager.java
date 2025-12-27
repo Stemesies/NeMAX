@@ -1,7 +1,9 @@
 package client.elements;
 
+import client.elements.cli.ServersideCommands;
 import utils.Ansi;
 import utils.cli.CommandProcessor;
+import utils.elements.ClientTypes;
 import utils.kt.Apply;
 
 import java.util.Scanner;
@@ -13,8 +15,13 @@ public class InputManager {
 
     private static Apply<String> inputInterceptor = null;
 
-    public static final CommandProcessor commandProcessor = new CommandProcessor();
+    static final CommandProcessor commandProcessor = new CommandProcessor();
     private static final Scanner in = new Scanner(System.in);
+
+    public InputManager() {
+        ServersideCommands.init(commandProcessor);
+        registerClientsideCommands();
+    }
 
     public static void startInputThread() {
         new Thread(() -> {
@@ -50,14 +57,15 @@ public class InputManager {
             if (procError != null) {
                 if (procError.type == PHANTOM_COMMAND)
                     ServerConnectManager.send(msg);
-                else
-                    procError.explain();
+                else {
+                    boolean isHtml = Client.getType() != ClientTypes.CONSOLE;
+                    OutputManager.print(procError.getMessage(isHtml));
+                }
             } else if (!procOutput.isEmpty())
-                System.out.print(procOutput);
+                OutputManager.print(procOutput);
 
             return;
         }
-
         ServerConnectManager.send(msg);
 
     }

@@ -25,6 +25,10 @@ public class ClientResponseCommands {
                 .executes((ctx) -> {
                     ctx.data.client.state = ClientStates.Fine;
                     ctx.data.client.type = ClientTypes.valueOf(ctx.getString("type"));
+                    System.out.println(
+                        "Received type from client "
+                            + ctx.data.client + ": " + ctx.getString("type")
+                    );
                 })
             ));
         processor.register("confirm", (a) -> a

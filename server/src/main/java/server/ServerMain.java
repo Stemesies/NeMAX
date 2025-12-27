@@ -3,6 +3,7 @@ package server;
 import server.elements.Client;
 import server.elements.ClientStates;
 import server.managers.DatabaseManager;
+import utils.elements.ClientTypes;
 import utils.network.SimpleServerSocket;
 
 import java.util.ArrayList;
@@ -11,7 +12,7 @@ import java.util.Scanner;
 import static server.elements.ServerData.getClients;
 import static server.elements.ServerData.getRegisteredClients;
 
-public class ServerMain {
+public class  ServerMain {
     SimpleServerSocket socket = null;
     private final Scanner in = new Scanner(System.in);
 
@@ -81,10 +82,11 @@ public class ServerMain {
             System.out.printf("Client %s connected\n", client);
             client.state = ClientStates.AwaitingType;
             client.stateRequest();
+            boolean isHtml = client.type == ClientTypes.GUI;
+            System.out.println(isHtml);
 
             while (client.hasNewMessage()) {
                 var line = client.receiveMessage();
-
 
                 ClientResponseCommands.processor.execute(
                     line,
@@ -103,19 +105,20 @@ public class ServerMain {
 
                 if (line.charAt(0) == '/') {
                     var proc = ClientCommands.processor;
+                    proc.getRawOutput().printAsHtml = client.type == ClientTypes.GUI;
                     proc.execute(
                         line,
                         new ClientCommands.ClientContextData(client, client.user, client.group)
                     );
 
                     if (proc.getLastError() != null)
-                        client.sendln(proc.getLastError());
+                        client.sendln(proc.getLastError().getMessage(isHtml));
                     else if (proc.getOutput() != null)
                         client.send(proc.getOutput());
                     continue;
                 }
 
-                client.sendMessageToChat(line);
+                client.sendMessageToChat(line, isHtml);
             }
 
             getClients().remove(client);

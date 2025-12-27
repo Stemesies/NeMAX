@@ -19,6 +19,9 @@ package utils;
  * </code></pre>
  */
 public class StringPrintWriter {
+
+    public boolean printAsHtml = false;
+
     StringBuilder str = new StringBuilder();
 
     @Override
@@ -31,6 +34,18 @@ public class StringPrintWriter {
         for (int i = 1; i < obj.length; i++) {
             str.append(' ');
             str.append(obj[i]);
+        }
+    }
+
+    public void stylePrint(Ansi style, Object... obj) {
+        if (printAsHtml) {
+            for (Object o : obj) {
+                str.append(Ansi.applyHtml(o, style));
+            }
+        } else {
+            for (Object o : obj) {
+                str.append(Ansi.applyStyle(o, style));
+            }
         }
     }
 
@@ -50,6 +65,13 @@ public class StringPrintWriter {
     public void printlnf(String format, Object... args) {
         str.append(String.format(format, args));
         str.append('\n');
+    }
+
+    public void stylePrintLnf(Ansi style, String format, Object... args) {
+        if (printAsHtml)
+            println(Ansi.applyHtml(format.formatted(args), style));
+        else
+            println(Ansi.applyStyle(format.formatted(args), style));
     }
 
     public void clear() {
