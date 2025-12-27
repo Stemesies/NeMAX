@@ -65,6 +65,22 @@ public class Ansi {
         return "\u001B[" + style + "m";
     }
 
+    public String start() {
+        return this.toString();
+    }
+
+    public String end() {
+        return Modes.RESET.toString();
+    }
+
+    public String startHtml() {
+        return openSpan;
+    }
+
+    public String closeHtml() {
+        return closeSpan;
+    }
+
     /**
      * Стилизует указанный текст, по завершении которого стиль сбрасывается.
      */
@@ -145,7 +161,7 @@ public class Ansi {
 
         public static final Ansi BLACK = new Ansi("30", "<span style=\"color: #000000\">", "</span>");
         public static final Ansi RED = new Ansi("31", "<span style=\"color: #dd1212\">", "</span>");
-        public static final Ansi GREEN = new Ansi("32", "<span style=\"color: green\">", "</span>");
+        public static final Ansi GREEN = new Ansi("32", "<span style=\"color: #004a02\">", "</span>");
         public static final Ansi YELLOW = new Ansi("33", "<span style=\"color: #f1ee35\">", "</span>");
         public static final Ansi BLUE = new Ansi("34", "<span style=\"color: #265dc2\">", "</span>");
         public static final Ansi MAGENTA = new Ansi("35", "<span style=\"color: #c226b8\">", "</span>");

@@ -1,5 +1,6 @@
 package gui;
 
+import client.elements.InputManager;
 import client.elements.OutputManager;
 import client.elements.cli.ServerCommands;
 import client.elements.Client;
@@ -39,7 +40,7 @@ public class ClientController implements Initializable {
 
         if (tf != null) {
             System.out.println("input: " + input);
-            Client.input.processInput(input);
+            InputManager.processInput(input);
             tf.setText(null);
         }
 
